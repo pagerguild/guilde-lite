@@ -11,5 +11,6 @@ brew "git"
 brew "git-lfs"
 brew "gh"                   # GitHub CLI
 brew "jj"                   # Jujutsu - Git-compatible VCS with better UX
+brew "just"                 # Command runner (simpler Make alternative)
 brew "mise"                 # Universal version manager
 brew "task"                 # Task runner (Make replacement)

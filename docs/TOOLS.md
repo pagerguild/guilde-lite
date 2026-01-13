@@ -79,6 +79,71 @@ gh release create v1.0.0       # Create release
 
 ---
 
+### Jujutsu (jj)
+
+**Version:** Latest (brew)
+**Replaces:** Git (optional, Git-compatible)
+**Why:** Modern VCS with better UX - automatic rebasing, first-class conflict handling, working copy as commit
+
+**Common Commands:**
+```bash
+jj git clone <repo-url>        # Clone a Git repository
+jj new                         # Create new change
+jj describe -m "message"       # Set commit message
+jj git push                    # Push to remote
+jj log                         # View commit graph
+jj squash                      # Squash into parent
+jj edit <rev>                  # Edit an older commit
+jj undo                        # Undo last operation
+```
+
+**Key Features:**
+- Working copy is always a commit (no staging area)
+- Built-in undo/redo for all operations
+- Automatic rebasing when editing history
+- First-class conflict handling (conflicts are commits)
+- Git-compatible (works with existing Git repos)
+
+**Configuration Location:** `~/.config/jj/config.toml`
+**Official Documentation:** https://martinvonz.github.io/jj
+
+---
+
+### Just
+
+**Version:** Latest (brew)
+**Replaces:** Make (for simple use cases)
+**Why:** Simple command runner with better syntax than Make, no build system complexity
+
+**Common Commands:**
+```bash
+just                           # List available recipes
+just <recipe>                  # Run a recipe
+just --list                    # Show all recipes with descriptions
+just --choose                  # Interactively select a recipe
+just --dry-run <recipe>        # Show what would run
+```
+
+**Example justfile:**
+```just
+# Build the project
+build:
+    cargo build --release
+
+# Run tests
+test:
+    cargo test
+
+# Deploy to production
+deploy: build test
+    ./deploy.sh
+```
+
+**Configuration Location:** `justfile` (project root)
+**Official Documentation:** https://just.systems/man/en
+
+---
+
 ### Mise
 
 **Version:** Latest (brew)

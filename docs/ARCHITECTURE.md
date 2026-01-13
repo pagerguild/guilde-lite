@@ -217,7 +217,7 @@ guilde-lite/
 ├── .gitignore                 # Excludes .DS_Store, logs, etc.
 │
 ├── brew/                      # Staged Brewfile breakdown
-│   ├── 01-core.Brewfile       # git, mise, task (required)
+│   ├── 01-core.Brewfile       # git, jj, just, mise, task (required)
 │   ├── 02-cli.Brewfile        # ripgrep, fd, bat, fzf, jq
 │   ├── 03-terminal.Brewfile   # Ghostty, tmux, fonts
 │   ├── 04-containers.Brewfile # OrbStack, kubectl, helm, k9s
@@ -1223,7 +1223,7 @@ fi
 ```yaml
 # Taskfile.yml
 stage:1:
-  desc: "Stage 1: Core tools (git, mise, task)"
+  desc: "Stage 1: Core tools (git, jj, just, mise, task)"
   cmds:
     - brew bundle install --file=brew/01-core.Brewfile --no-lock
     - task: stage:1:verify

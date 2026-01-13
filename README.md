@@ -22,7 +22,7 @@ Install incrementally to test each step:
 
 ```bash
 # Run stages individually
-task stage:1              # Core (git, mise, task)
+task stage:1              # Core (git, jj, just, mise, task)
 task stage:2              # CLI tools (ripgrep, fd, bat, etc.)
 task stage:3              # Terminal (Ghostty, tmux, fonts)
 task stage:4              # Containers (OrbStack, kubectl, helm)

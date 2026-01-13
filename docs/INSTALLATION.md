@@ -207,8 +207,10 @@ task stage:1
 - ✓ git - Version control
 - ✓ git-lfs - Large file storage
 - ✓ gh - GitHub CLI
+- ✓ jj - Jujutsu VCS (Git-compatible with better UX)
+- ✓ just - Simple command runner
 - ✓ mise - Universal runtime manager
-- ✓ task - Task runner
+- ✓ task - Task runner (Go-based Make replacement)
 
 **Time:** ~2 minutes
 
@@ -220,9 +222,11 @@ task stage:1:verify
 **Manual verification:**
 ```bash
 git --version              # Should show 2.40+
-gh --version              # Should show 2.40+
-mise --version            # Should show 2024.12+
-task --version            # Should show v3.30+
+gh --version               # Should show 2.40+
+jj --version               # Should show 0.35+
+just --version             # Should show 1.40+
+mise --version             # Should show 2024.12+
+task --version             # Should show v3.30+
 ```
 
 **Common Issues:**
