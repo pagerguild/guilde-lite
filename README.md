@@ -9,14 +9,49 @@ Reproducible, automated development environment for AI/Agent development.
 git clone https://github.com/YOUR_ORG/guilde-lite.git ~/guilde-lite
 cd ~/guilde-lite
 
-# Run bootstrap
-./install.sh
+# Run bootstrap (choose one)
+./install.sh              # Default: all Homebrew + runtimes + configs
+./install.sh minimal      # Core + CLI + runtimes only
+./install.sh developer    # Minimal + terminal + containers
+./install.sh full         # Everything including AI and databases
 ```
 
-Or one-liner:
+## Staged Installation
+
+Install incrementally to test each step:
+
 ```bash
-curl -fsSL https://raw.githubusercontent.com/YOUR_ORG/guilde-lite/main/install.sh | bash
+# Run stages individually
+task stage:1              # Core (git, mise, task)
+task stage:2              # CLI tools (ripgrep, fd, bat, etc.)
+task stage:3              # Terminal (Ghostty, tmux, fonts)
+task stage:4              # Containers (OrbStack, kubectl, helm)
+task stage:5              # Database clients (psql, redis-cli)
+task stage:6              # Cloud/AWS (awscli, granted)
+task stage:7              # AI tools (Cursor)
+task stage:8              # Security (age, sops, trivy)
+task stage:9              # Build tools (cmake, ninja)
+task stage:runtimes       # Languages (Go, Python, Rust, Bun)
+task stage:configs        # Config files (shell, git, tmux)
+task stage:databases      # Start database containers
+task stage:ai-tools       # Claude Code
+
+# Verify any stage
+task stage:1:verify
+task stage:2:verify
+# etc.
+
+# See all stages
+task help:stages
 ```
+
+### Preset Bundles
+
+| Bundle | What's Included |
+|--------|-----------------|
+| `setup:minimal` | Core + CLI + runtimes |
+| `setup:developer` | Minimal + terminal + containers + build |
+| `setup:full` | Everything including AI and databases |
 
 ## What's Included
 

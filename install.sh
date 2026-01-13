@@ -1,7 +1,13 @@
 #!/bin/bash
 # Bootstrap Script - One-command environment setup
-# Usage: curl -fsSL https://raw.githubusercontent.com/YOUR_ORG/guilde-lite/main/install.sh | bash
-# Or: ./install.sh
+# Supports staged installation for testing
+#
+# Usage:
+#   ./install.sh              # Full setup (all stages)
+#   ./install.sh minimal      # Core + CLI + runtimes only
+#   ./install.sh developer    # Minimal + terminal + containers
+#   ./install.sh full         # Everything including AI and databases
+#   ./install.sh stage N      # Run specific stage (1-9)
 
 set -euo pipefail
 
@@ -17,6 +23,35 @@ log_success() { echo -e "${GREEN}[OK]${NC} $1"; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
+show_help() {
+    echo ""
+    echo "Usage: ./install.sh [OPTION]"
+    echo ""
+    echo "Options:"
+    echo "  (none)      Full setup - all stages"
+    echo "  minimal     Core + CLI + runtimes only"
+    echo "  developer   Minimal + terminal + containers + build tools"
+    echo "  full        Everything including AI and databases"
+    echo "  stage N     Run specific stage (1-9, runtimes, configs)"
+    echo "  help        Show this help message"
+    echo ""
+    echo "Stages:"
+    echo "  1           Core tools (git, mise, task)"
+    echo "  2           Modern CLI (ripgrep, fd, bat, etc.)"
+    echo "  3           Terminal (Ghostty, tmux, fonts)"
+    echo "  4           Containers (OrbStack, kubectl, helm)"
+    echo "  5           Database clients (psql, redis-cli)"
+    echo "  6           Cloud/AWS (awscli, granted)"
+    echo "  7           AI tools (Cursor)"
+    echo "  8           Security (age, sops, trivy)"
+    echo "  9           Build tools (cmake, ninja)"
+    echo "  runtimes    Languages via mise (Go, Python, Rust, Bun)"
+    echo "  configs     Shell, git, tmux, ghostty configs"
+    echo "  databases   Start database containers"
+    echo "  ai-tools    Claude Code and AI tools"
+    echo ""
+}
+
 echo ""
 echo "╔══════════════════════════════════════════════════════════════════╗"
 echo "║                                                                  ║"
@@ -26,6 +61,12 @@ echo "║   Modern, reproducible setup for AI/Agent development           ║"
 echo "║                                                                  ║"
 echo "╚══════════════════════════════════════════════════════════════════╝"
 echo ""
+
+# Handle help
+if [[ "${1:-}" == "help" ]] || [[ "${1:-}" == "--help" ]] || [[ "${1:-}" == "-h" ]]; then
+    show_help
+    exit 0
+fi
 
 # =============================================================================
 # PRE-FLIGHT CHECKS
@@ -78,7 +119,7 @@ log_info "Updating Homebrew..."
 brew update
 
 # =============================================================================
-# TASK RUNNER
+# TASK RUNNER (Required for all installation types)
 # =============================================================================
 
 if ! command -v task &>/dev/null; then
@@ -90,7 +131,7 @@ else
 fi
 
 # =============================================================================
-# MISE (Runtime Version Manager)
+# MISE (Required for runtimes)
 # =============================================================================
 
 if ! command -v mise &>/dev/null; then
@@ -105,15 +146,48 @@ else
 fi
 
 # =============================================================================
-# HAND OFF TO TASKFILE
+# DETERMINE INSTALLATION TYPE
 # =============================================================================
 
+INSTALL_TYPE="${1:-setup}"
+STAGE_NUM="${2:-}"
+
 echo ""
-log_info "Handing off to Taskfile for remaining setup..."
+log_info "Installation type: $INSTALL_TYPE"
 echo ""
 
-# Run full setup
-task setup
+case "$INSTALL_TYPE" in
+    "minimal")
+        log_info "Running minimal setup..."
+        task setup:minimal
+        ;;
+    "developer")
+        log_info "Running developer setup..."
+        task setup:developer
+        ;;
+    "full")
+        log_info "Running full setup..."
+        task setup:full
+        ;;
+    "stage")
+        if [[ -z "$STAGE_NUM" ]]; then
+            log_error "Please specify a stage number: ./install.sh stage N"
+            show_help
+            exit 1
+        fi
+        log_info "Running stage: $STAGE_NUM"
+        task "stage:$STAGE_NUM"
+        ;;
+    "setup"|"")
+        log_info "Running default setup (all Homebrew packages + runtimes + configs)..."
+        task setup
+        ;;
+    *)
+        log_error "Unknown option: $INSTALL_TYPE"
+        show_help
+        exit 1
+        ;;
+esac
 
 # =============================================================================
 # POST-INSTALL INSTRUCTIONS
@@ -130,17 +204,15 @@ echo "Next steps:"
 echo ""
 echo "  1. Restart your terminal (or run: source ~/.zshrc)"
 echo ""
-echo "  2. Start databases:"
-echo "     task db:up"
-echo ""
-echo "  3. Verify everything works:"
+echo "  2. Verify the installation:"
 echo "     task verify"
 echo ""
-echo "  4. For AI agent sandboxing, build the container:"
-echo "     task sandbox:build"
+echo "  3. See staged installation guide:"
+echo "     task help:stages"
 echo ""
-echo "  5. See all available commands:"
-echo "     task"
+echo "  4. If you ran minimal/developer setup, continue with:"
+echo "     task stage:N          # Run additional stages"
+echo "     task setup:full       # Complete full setup"
 echo ""
 echo "Documentation: ./README.md"
 echo ""

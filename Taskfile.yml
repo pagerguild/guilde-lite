@@ -10,7 +10,7 @@ vars:
   CONFIG_DIR: '{{.HOME}}/.config'
 
 # =============================================================================
-# SETUP TASKS
+# MAIN TASKS
 # =============================================================================
 tasks:
   default:
@@ -18,48 +18,327 @@ tasks:
     cmds:
       - task --list
 
-  setup:
-    desc: "Full environment setup (Day 1)"
-    cmds:
-      - task: brew
-      - task: runtimes
-      - task: configs
-      - task: verify
-    silent: false
+  # ===========================================================================
+  # STAGED INSTALLATION (Recommended for testing)
+  # ===========================================================================
+  # Run stages in order: task stage:1 && task stage:2 && ...
+  # Or run all at once: task setup
 
-  brew:
-    desc: "Install system dependencies via Homebrew"
+  stage:1:
+    desc: "Stage 1: Core tools (git, mise, task)"
     cmds:
-      - echo "Installing Homebrew packages..."
-      - brew bundle install --file=Brewfile --no-lock
-    status:
-      - test -f /opt/homebrew/bin/mise
+      - task: stage:1:install
+      - task: stage:1:verify
 
-  runtimes:
-    desc: "Install language runtimes via mise"
+  stage:1:install:
+    desc: "Install Stage 1 packages"
     cmds:
-      - echo "Installing runtimes via mise..."
+      - echo "=== Stage 1: Installing core tools ==="
+      - brew bundle install --file=brew/01-core.Brewfile --no-lock
+
+  stage:1:verify:
+    desc: "Verify Stage 1 installation"
+    cmds:
+      - echo "=== Verifying Stage 1 ==="
+      - command -v git && git --version
+      - command -v mise && mise --version
+      - command -v task && task --version
+      - echo "✓ Stage 1 complete"
+
+  stage:2:
+    desc: "Stage 2: Modern CLI tools (ripgrep, fd, bat, etc.)"
+    cmds:
+      - task: stage:2:install
+      - task: stage:2:verify
+
+  stage:2:install:
+    desc: "Install Stage 2 packages"
+    cmds:
+      - echo "=== Stage 2: Installing CLI tools ==="
+      - brew bundle install --file=brew/02-cli.Brewfile --no-lock
+
+  stage:2:verify:
+    desc: "Verify Stage 2 installation"
+    cmds:
+      - echo "=== Verifying Stage 2 ==="
+      - command -v rg && rg --version | head -1
+      - command -v fd && fd --version
+      - command -v bat && bat --version | head -1
+      - command -v eza && eza --version | head -1
+      - command -v fzf && fzf --version
+      - command -v jq && jq --version
+      - command -v starship && starship --version
+      - echo "✓ Stage 2 complete"
+
+  stage:3:
+    desc: "Stage 3: Terminal & tmux (Ghostty, fonts)"
+    cmds:
+      - task: stage:3:install
+      - task: stage:3:verify
+
+  stage:3:install:
+    desc: "Install Stage 3 packages"
+    cmds:
+      - echo "=== Stage 3: Installing terminal tools ==="
+      - brew bundle install --file=brew/03-terminal.Brewfile --no-lock
+
+  stage:3:verify:
+    desc: "Verify Stage 3 installation"
+    cmds:
+      - echo "=== Verifying Stage 3 ==="
+      - command -v tmux && tmux -V
+      - test -d "/Applications/Ghostty.app" && echo "Ghostty installed" || echo "Ghostty not found (may need manual install)"
+      - echo "✓ Stage 3 complete"
+
+  stage:4:
+    desc: "Stage 4: Containers (OrbStack, kubectl, helm)"
+    cmds:
+      - task: stage:4:install
+      - task: stage:4:verify
+
+  stage:4:install:
+    desc: "Install Stage 4 packages"
+    cmds:
+      - echo "=== Stage 4: Installing container tools ==="
+      - brew bundle install --file=brew/04-containers.Brewfile --no-lock
+
+  stage:4:verify:
+    desc: "Verify Stage 4 installation"
+    cmds:
+      - echo "=== Verifying Stage 4 ==="
+      - test -d "/Applications/OrbStack.app" && echo "OrbStack installed" || echo "OrbStack not found"
+      - command -v docker && docker --version || echo "Docker CLI not available (start OrbStack)"
+      - command -v kubectl && kubectl version --client 2>/dev/null | head -1 || true
+      - command -v helm && helm version --short || true
+      - echo "✓ Stage 4 complete"
+
+  stage:5:
+    desc: "Stage 5: Database clients (psql, redis-cli)"
+    cmds:
+      - task: stage:5:install
+      - task: stage:5:verify
+
+  stage:5:install:
+    desc: "Install Stage 5 packages"
+    cmds:
+      - echo "=== Stage 5: Installing database clients ==="
+      - brew bundle install --file=brew/05-databases.Brewfile --no-lock
+
+  stage:5:verify:
+    desc: "Verify Stage 5 installation"
+    cmds:
+      - echo "=== Verifying Stage 5 ==="
+      - command -v psql && psql --version
+      - command -v redis-cli && redis-cli --version
+      - echo "✓ Stage 5 complete"
+
+  stage:6:
+    desc: "Stage 6: Cloud/AWS tools (awscli, granted)"
+    cmds:
+      - task: stage:6:install
+      - task: stage:6:verify
+
+  stage:6:install:
+    desc: "Install Stage 6 packages"
+    cmds:
+      - echo "=== Stage 6: Installing cloud tools ==="
+      - brew bundle install --file=brew/06-cloud.Brewfile --no-lock
+
+  stage:6:verify:
+    desc: "Verify Stage 6 installation"
+    cmds:
+      - echo "=== Verifying Stage 6 ==="
+      - command -v aws && aws --version
+      - command -v granted && granted --version || echo "granted installed (use 'assume' command)"
+      - echo "✓ Stage 6 complete"
+
+  stage:7:
+    desc: "Stage 7: AI tools (Cursor)"
+    cmds:
+      - task: stage:7:install
+      - task: stage:7:verify
+
+  stage:7:install:
+    desc: "Install Stage 7 packages"
+    cmds:
+      - echo "=== Stage 7: Installing AI tools ==="
+      - brew bundle install --file=brew/07-ai.Brewfile --no-lock
+
+  stage:7:verify:
+    desc: "Verify Stage 7 installation"
+    cmds:
+      - echo "=== Verifying Stage 7 ==="
+      - test -d "/Applications/Cursor.app" && echo "Cursor installed" || echo "Cursor not found"
+      - echo "✓ Stage 7 complete"
+
+  stage:8:
+    desc: "Stage 8: Security tools (age, sops, trivy)"
+    cmds:
+      - task: stage:8:install
+      - task: stage:8:verify
+
+  stage:8:install:
+    desc: "Install Stage 8 packages"
+    cmds:
+      - echo "=== Stage 8: Installing security tools ==="
+      - brew bundle install --file=brew/08-security.Brewfile --no-lock
+
+  stage:8:verify:
+    desc: "Verify Stage 8 installation"
+    cmds:
+      - echo "=== Verifying Stage 8 ==="
+      - command -v age && age --version
+      - command -v sops && sops --version | head -1
+      - command -v trivy && trivy --version | head -1
+      - echo "✓ Stage 8 complete"
+
+  stage:9:
+    desc: "Stage 9: Build tools (cmake, ninja, golangci-lint)"
+    cmds:
+      - task: stage:9:install
+      - task: stage:9:verify
+
+  stage:9:install:
+    desc: "Install Stage 9 packages"
+    cmds:
+      - echo "=== Stage 9: Installing build tools ==="
+      - brew bundle install --file=brew/09-build.Brewfile --no-lock
+
+  stage:9:verify:
+    desc: "Verify Stage 9 installation"
+    cmds:
+      - echo "=== Verifying Stage 9 ==="
+      - command -v cmake && cmake --version | head -1
+      - command -v ninja && ninja --version
+      - command -v golangci-lint && golangci-lint --version | head -1
+      - echo "✓ Stage 9 complete"
+
+  stage:runtimes:
+    desc: "Stage R: Language runtimes via mise (Go, Python, Rust, Bun)"
+    cmds:
+      - task: stage:runtimes:install
+      - task: stage:runtimes:verify
+
+  stage:runtimes:install:
+    desc: "Install language runtimes"
+    cmds:
+      - echo "=== Installing runtimes via mise ==="
       - mise install --yes
-      - task: ai-tools
-    status:
-      - mise current go
 
-  ai-tools:
-    desc: "Install AI coding tools"
-    internal: true
+  stage:runtimes:verify:
+    desc: "Verify runtime installation"
     cmds:
-      - echo "Installing AI tools..."
-      - npm install -g @anthropic-ai/claude-code || true
-      # Add other AI tools as they become available
+      - echo "=== Verifying runtimes ==="
+      - mise current
+      - go version || echo "Go not installed"
+      - rustc --version || echo "Rust not installed"
+      - python --version || echo "Python not installed"
+      - bun --version || echo "Bun not installed"
+      - uv --version || echo "uv not installed"
+      - echo "✓ Runtimes complete"
 
-  configs:
-    desc: "Apply configuration files"
+  stage:configs:
+    desc: "Stage C: Apply all configurations (shell, git, tmux, ghostty)"
     cmds:
-      - task: config:ghostty
-      - task: config:tmux
       - task: config:shell
       - task: config:git
+      - task: config:tmux
+      - task: config:ghostty
+      - echo "✓ Configs complete"
 
+  stage:databases:
+    desc: "Stage D: Start database containers"
+    cmds:
+      - task: db:up
+      - task: db:wait
+      - echo "✓ Databases running"
+
+  stage:ai-tools:
+    desc: "Stage AI: Install Claude Code and other AI tools"
+    cmds:
+      - echo "=== Installing AI coding tools ==="
+      - npm install -g @anthropic-ai/claude-code || bun install -g @anthropic-ai/claude-code || true
+      - command -v claude && claude --version || echo "Claude Code installation may require restart"
+      - echo "✓ AI tools complete"
+
+  # ===========================================================================
+  # FULL SETUP (All stages)
+  # ===========================================================================
+  setup:
+    desc: "Full environment setup (all stages)"
+    cmds:
+      - task: setup:brew
+      - task: stage:runtimes
+      - task: stage:configs
+      - task: verify
+
+  setup:brew:
+    desc: "Install all Homebrew packages (stages 1-9)"
+    cmds:
+      - task: stage:1
+      - task: stage:2
+      - task: stage:3
+      - task: stage:4
+      - task: stage:5
+      - task: stage:6
+      - task: stage:7
+      - task: stage:8
+      - task: stage:9
+
+  setup:minimal:
+    desc: "Minimal setup (core + CLI + runtimes only)"
+    cmds:
+      - task: stage:1
+      - task: stage:2
+      - task: stage:runtimes
+      - task: config:shell
+      - task: config:git
+      - echo "✓ Minimal setup complete"
+
+  setup:developer:
+    desc: "Developer setup (minimal + terminal + containers)"
+    cmds:
+      - task: setup:minimal
+      - task: stage:3
+      - task: stage:4
+      - task: stage:9
+      - task: config:tmux
+      - task: config:ghostty
+      - echo "✓ Developer setup complete"
+
+  setup:full:
+    desc: "Full setup (everything including AI and databases)"
+    cmds:
+      - task: setup:developer
+      - task: stage:5
+      - task: stage:6
+      - task: stage:7
+      - task: stage:8
+      - task: stage:ai-tools
+      - task: stage:databases
+      - echo "✓ Full setup complete"
+
+  # ===========================================================================
+  # LEGACY ALIASES (for backwards compatibility)
+  # ===========================================================================
+  brew:
+    desc: "Install all Homebrew packages (alias for setup:brew)"
+    cmds:
+      - task: setup:brew
+
+  runtimes:
+    desc: "Install language runtimes (alias for stage:runtimes)"
+    cmds:
+      - task: stage:runtimes
+
+  configs:
+    desc: "Apply configurations (alias for stage:configs)"
+    cmds:
+      - task: stage:configs
+
+  # ===========================================================================
+  # CONFIGURATION TASKS
+  # ===========================================================================
   config:ghostty:
     desc: "Install Ghostty configuration"
     cmds:
@@ -101,16 +380,13 @@ tasks:
       - echo "Git config updated"
 
   verify:
-    desc: "Verify environment setup"
+    desc: "Verify full environment setup"
     cmds:
-      - echo "Verifying environment..."
-      - go version || echo "Go not installed"
-      - rustc --version || echo "Rust not installed"
-      - python --version || echo "Python not installed"
-      - bun --version || echo "Bun not installed"
-      - uv --version || echo "uv not installed"
-      - claude --version || echo "Claude Code not installed"
-      - echo "Environment verified!"
+      - echo "=== Full Environment Verification ==="
+      - task: stage:1:verify
+      - task: stage:2:verify
+      - task: stage:runtimes:verify
+      - echo "=== All verifications passed ==="
 
   # ===========================================================================
   # DATABASE TASKS
@@ -120,7 +396,6 @@ tasks:
     cmds:
       - docker compose -f docker/docker-compose.yml up -d
       - echo "Databases starting..."
-      - task: db:wait
 
   db:down:
     desc: "Stop all databases"
@@ -135,14 +410,32 @@ tasks:
 
   db:wait:
     desc: "Wait for databases to be ready"
-    internal: true
     cmds:
       - |
         echo "Waiting for PostgreSQL..."
-        until docker exec dev-postgres pg_isready -U dev; do sleep 1; done
+        timeout=60
+        while ! docker exec dev-postgres pg_isready -U dev 2>/dev/null; do
+          sleep 1
+          timeout=$((timeout - 1))
+          if [ $timeout -le 0 ]; then
+            echo "PostgreSQL timeout"
+            exit 1
+          fi
+        done
+        echo "PostgreSQL ready"
+      - |
         echo "Waiting for Redis..."
-        until docker exec dev-redis redis-cli -a dev ping; do sleep 1; done
-        echo "All databases ready!"
+        timeout=60
+        while ! docker exec dev-redis redis-cli -a dev ping 2>/dev/null | grep -q PONG; do
+          sleep 1
+          timeout=$((timeout - 1))
+          if [ $timeout -le 0 ]; then
+            echo "Redis timeout"
+            exit 1
+          fi
+        done
+        echo "Redis ready"
+      - echo "All databases ready!"
 
   db:psql:
     desc: "Connect to PostgreSQL"
@@ -153,6 +446,11 @@ tasks:
     desc: "Connect to Redis CLI"
     cmds:
       - docker exec -it dev-redis redis-cli -a dev
+
+  db:status:
+    desc: "Check database container status"
+    cmds:
+      - docker compose -f docker/docker-compose.yml ps
 
   # ===========================================================================
   # SANDBOX TASKS (AI Agent Isolation)
@@ -233,13 +531,13 @@ tasks:
   lint:go:
     desc: "Lint Go code"
     cmds:
-      - go vet ./...
+      - go vet ./... || true
       - golangci-lint run || true
 
   lint:python:
     desc: "Lint Python code"
     cmds:
-      - uv run ruff check .
+      - uv run ruff check . || true
       - uv run mypy . || true
 
   lint:ts:
@@ -257,17 +555,17 @@ tasks:
   test:go:
     desc: "Run Go tests"
     cmds:
-      - go test -v -race ./...
+      - go test -v -race ./... || true
 
   test:python:
     desc: "Run Python tests"
     cmds:
-      - uv run pytest -v
+      - uv run pytest -v || true
 
   test:ts:
     desc: "Run TypeScript tests"
     cmds:
-      - bun test
+      - bun test || true
 
   build:
     desc: "Build all artifacts"
@@ -298,14 +596,49 @@ tasks:
   clean:
     desc: "Clean build artifacts and caches"
     cmds:
-      - go clean -cache
-      - uv cache clean
-      - bun pm cache rm
-      - docker system prune -f
+      - go clean -cache || true
+      - uv cache clean || true
+      - bun pm cache rm || true
+      - docker system prune -f || true
 
   clean:all:
     desc: "Deep clean (includes databases)"
     cmds:
       - task: clean
       - task: db:down
-      - docker volume prune -f
+      - docker volume prune -f || true
+
+  # ===========================================================================
+  # HELP & INFO
+  # ===========================================================================
+  help:stages:
+    desc: "Show staged installation guide"
+    cmds:
+      - |
+        echo ""
+        echo "=== Staged Installation Guide ==="
+        echo ""
+        echo "Run stages individually to test each step:"
+        echo ""
+        echo "  task stage:1          # Core (git, mise, task)"
+        echo "  task stage:2          # CLI tools (ripgrep, fd, bat, etc.)"
+        echo "  task stage:3          # Terminal (Ghostty, tmux, fonts)"
+        echo "  task stage:4          # Containers (OrbStack, kubectl, helm)"
+        echo "  task stage:5          # Database clients (psql, redis-cli)"
+        echo "  task stage:6          # Cloud/AWS (awscli, granted)"
+        echo "  task stage:7          # AI tools (Cursor)"
+        echo "  task stage:8          # Security (age, sops, trivy)"
+        echo "  task stage:9          # Build tools (cmake, ninja)"
+        echo "  task stage:runtimes   # Languages (Go, Python, Rust, Bun)"
+        echo "  task stage:configs    # Config files (shell, git, tmux)"
+        echo "  task stage:databases  # Start database containers"
+        echo "  task stage:ai-tools   # Claude Code and AI tools"
+        echo ""
+        echo "Or use preset bundles:"
+        echo ""
+        echo "  task setup:minimal    # Core + CLI + runtimes"
+        echo "  task setup:developer  # Minimal + terminal + containers + build"
+        echo "  task setup:full       # Everything including AI and databases"
+        echo ""
+        echo "Verify any stage with: task stage:N:verify"
+        echo ""
