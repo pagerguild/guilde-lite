@@ -1,6 +1,8 @@
+# yaml-language-server: $schema=https://mise.jdx.dev/schema/mise.json
 # mise.toml - Universal Runtime Version Management
 # Replaces: nvm, pyenv, goenv, rbenv, rustup (for version pinning)
 # https://mise.jdx.dev
+# Schema: https://mise.jdx.dev/schema/mise.json
 
 [tools]
 # =============================================================================
@@ -32,14 +34,12 @@ bun = "latest"
 uv = "latest"
 
 # =============================================================================
-# AI CODING TOOLS (via npm/bun)
+# AI CODING TOOLS
 # =============================================================================
-
-# Claude Code - Anthropic's CLI coding assistant
-"npm:@anthropic-ai/claude-code" = "latest"
-
-# OpenAI Codex CLI (if available)
-# "npm:@openai/codex" = "latest"
+# Note: Claude Code is installed via `task stage:ai-tools` after node/bun
+# This avoids circular dependency (npm packages need node to resolve)
+# Install manually: npm install -g @anthropic-ai/claude-code
+#                   or: bun install -g @anthropic-ai/claude-code
 
 # =============================================================================
 # PYTHON TOOLS (via pipx/uv)
@@ -121,14 +121,17 @@ trusted_config_paths = ["~/dev"]
 # Automatically install missing tools
 auto_install = true
 
-# Use shims for better shell integration
-shims_dir = "~/.local/share/mise/shims"
+# Use parallel jobs for faster installation
+jobs = 4
 
-[alias.python]
-# Shorthand aliases
+# =============================================================================
+# TOOL VERSION ALIASES (new format, replaces deprecated [alias])
+# =============================================================================
+
+[tool_alias.python.versions]
 py312 = "3.12"
 py311 = "3.11"
 
-[alias.node]
+[tool_alias.node.versions]
 lts-iron = "20"
 lts-hydrogen = "18"

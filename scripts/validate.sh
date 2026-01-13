@@ -56,6 +56,35 @@ fi
 echo ""
 
 # -----------------------------------------------------------------------------
+# 1b. Validate mise.toml
+# -----------------------------------------------------------------------------
+echo "--- Validating mise.toml ---"
+
+if command -v mise &>/dev/null; then
+    # Check for deprecation warnings
+    mise_output=$(mise ls 2>&1)
+    if echo "$mise_output" | grep -q "WARN"; then
+        log_error "mise.toml has warnings:"
+        echo "$mise_output" | grep "WARN" | while read line; do log_info "  $line"; done
+    else
+        log_success "mise.toml: No deprecation warnings"
+    fi
+
+    # Validate mise.toml schema (if check-jsonschema available)
+    if python3 -c "import check_jsonschema" 2>/dev/null; then
+        if python3 -m check_jsonschema --schemafile "https://mise.jdx.dev/schema/mise.json" mise.toml 2>/dev/null; then
+            log_success "mise.toml: Schema validation passed"
+        else
+            log_warn "mise.toml: Schema validation issues (may be false positive)"
+        fi
+    fi
+else
+    log_warn "mise not installed, skipping mise.toml validation"
+fi
+
+echo ""
+
+# -----------------------------------------------------------------------------
 # 2. Validate Brewfiles
 # -----------------------------------------------------------------------------
 echo "--- Validating Brewfiles ---"
