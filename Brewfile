@@ -18,6 +18,7 @@ cask "orbstack"             # Container engine (Docker Desktop replacement, ~4GB
 brew "git"
 brew "git-lfs"
 brew "gh"                   # GitHub CLI
+brew "jj"                   # Jujutsu - Git-compatible VCS with better UX
 
 # =============================================================================
 # 2. RUNTIME & VERSION MANAGEMENT

@@ -25,7 +25,7 @@ tasks:
   # Or run all at once: task setup
 
   stage:1:
-    desc: "Stage 1: Core tools (git, mise, task)"
+    desc: "Stage 1: Core tools (git, jj, mise, task)"
     cmds:
       - task: stage:1:install
       - task: stage:1:verify
@@ -41,6 +41,7 @@ tasks:
     cmds:
       - echo "=== Verifying Stage 1 ==="
       - command -v git && git --version
+      - command -v jj && jj --version
       - command -v mise && mise --version
       - command -v task && task --version
       - echo "✓ Stage 1 complete"

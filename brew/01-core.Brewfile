@@ -10,5 +10,6 @@ tap "go-task/tap"           # Task runner
 brew "git"
 brew "git-lfs"
 brew "gh"                   # GitHub CLI
+brew "jj"                   # Jujutsu - Git-compatible VCS with better UX
 brew "mise"                 # Universal version manager
 brew "task"                 # Task runner (Make replacement)
