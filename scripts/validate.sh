@@ -85,6 +85,42 @@ fi
 echo ""
 
 # -----------------------------------------------------------------------------
+# 1c. Check for Homebrew/mise runtime conflicts
+# -----------------------------------------------------------------------------
+echo "--- Checking for runtime conflicts ---"
+
+# Runtimes that should be managed by mise, not Homebrew
+mise_managed_tools="bun node python go rust deno terraform uv"
+conflicts_found=false
+
+for tool in $mise_managed_tools; do
+    # Check if installed via Homebrew
+    if brew list "$tool" &>/dev/null 2>&1; then
+        log_error "CONFLICT: $tool installed via Homebrew (should use mise)"
+        log_info "  Fix: brew uninstall $tool && mise install $tool"
+        conflicts_found=true
+    fi
+done
+
+# Check for manual bun installation
+if [ -d "$HOME/.bun" ]; then
+    log_error "CONFLICT: Manual bun installation found at ~/.bun"
+    log_info "  Fix: rm -rf ~/.bun && mise install bun"
+    conflicts_found=true
+fi
+
+# Check for manual rust installation (rustup outside mise)
+if [ -f "$HOME/.rustup/settings.toml" ] && ! mise ls rust &>/dev/null 2>&1; then
+    log_warn "Manual rustup installation found (consider using mise for rust)"
+fi
+
+if [ "$conflicts_found" = false ]; then
+    log_success "No runtime conflicts found"
+fi
+
+echo ""
+
+# -----------------------------------------------------------------------------
 # 2. Validate Brewfiles
 # -----------------------------------------------------------------------------
 echo "--- Validating Brewfiles ---"
