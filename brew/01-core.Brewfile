@@ -4,7 +4,7 @@
 
 # Taps
 tap "go-task/tap"           # Task runner
-tap "jdx/mise"              # Runtime version manager
+# Note: mise is now in homebrew-core, no tap needed
 
 # Core
 brew "git"

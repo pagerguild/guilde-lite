@@ -8,7 +8,7 @@ tap "homebrew/cask-fonts"   # Required for Nerd Fonts
 tap "go-task/tap"           # Task runner (Make replacement)
 tap "common-fate/granted"   # Modern AWS SSO
 tap "oven-sh/bun"           # Bun runtime
-tap "jdx/mise"              # Runtime version manager
+# Note: mise is now in homebrew-core, no tap needed
 
 # =============================================================================
 # 1. CORE INFRASTRUCTURE
