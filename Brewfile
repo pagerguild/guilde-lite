@@ -5,10 +5,9 @@
 # TAPS
 # =============================================================================
 tap "homebrew/cask-fonts"   # Required for Nerd Fonts
-tap "go-task/tap"           # Task runner (Make replacement)
 tap "common-fate/granted"   # Modern AWS SSO
 tap "oven-sh/bun"           # Bun runtime
-# Note: mise is now in homebrew-core, no tap needed
+# Note: mise and go-task are now in homebrew-core, no taps needed
 
 # =============================================================================
 # 1. CORE INFRASTRUCTURE
@@ -18,6 +17,7 @@ cask "orbstack"             # Container engine (Docker Desktop replacement, ~4GB
 brew "git"
 brew "git-lfs"
 brew "gh"                   # GitHub CLI
+brew "go-task"              # Task runner (Make replacement) - NOT "task" (Taskwarrior)
 brew "jj"                   # Jujutsu - Git-compatible VCS with better UX
 brew "just"                 # Command runner (simpler Make alternative)
 
@@ -96,7 +96,6 @@ brew "trivy"                # Security scanner
 # =============================================================================
 # 10. BUILD TOOLS
 # =============================================================================
-brew "task"                 # Task runner (Make replacement)
 brew "golangci-lint"        # Go linter aggregator
 brew "cmake"
 brew "ninja"

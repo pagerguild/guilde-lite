@@ -33,7 +33,7 @@ tasks:
   stage:1:install:
     desc: "Install Stage 1 packages"
     cmds:
-      - echo "=== Stage 1: Installing core tools ==="
+      - 'echo "=== Stage 1: Installing core tools ==="'
       - brew bundle install --file=brew/01-core.Brewfile --no-lock
 
   stage:1:verify:
@@ -56,7 +56,7 @@ tasks:
   stage:2:install:
     desc: "Install Stage 2 packages"
     cmds:
-      - echo "=== Stage 2: Installing CLI tools ==="
+      - 'echo "=== Stage 2: Installing CLI tools ==="'
       - brew bundle install --file=brew/02-cli.Brewfile --no-lock
 
   stage:2:verify:
@@ -81,7 +81,7 @@ tasks:
   stage:3:install:
     desc: "Install Stage 3 packages"
     cmds:
-      - echo "=== Stage 3: Installing terminal tools ==="
+      - 'echo "=== Stage 3: Installing terminal tools ==="'
       - brew bundle install --file=brew/03-terminal.Brewfile --no-lock
 
   stage:3:verify:
@@ -101,7 +101,7 @@ tasks:
   stage:4:install:
     desc: "Install Stage 4 packages"
     cmds:
-      - echo "=== Stage 4: Installing container tools ==="
+      - 'echo "=== Stage 4: Installing container tools ==="'
       - brew bundle install --file=brew/04-containers.Brewfile --no-lock
 
   stage:4:verify:
@@ -123,7 +123,7 @@ tasks:
   stage:5:install:
     desc: "Install Stage 5 packages"
     cmds:
-      - echo "=== Stage 5: Installing database clients ==="
+      - 'echo "=== Stage 5: Installing database clients ==="'
       - brew bundle install --file=brew/05-databases.Brewfile --no-lock
 
   stage:5:verify:
@@ -143,7 +143,7 @@ tasks:
   stage:6:install:
     desc: "Install Stage 6 packages"
     cmds:
-      - echo "=== Stage 6: Installing cloud tools ==="
+      - 'echo "=== Stage 6: Installing cloud tools ==="'
       - brew bundle install --file=brew/06-cloud.Brewfile --no-lock
 
   stage:6:verify:
@@ -163,7 +163,7 @@ tasks:
   stage:7:install:
     desc: "Install Stage 7 packages"
     cmds:
-      - echo "=== Stage 7: Installing AI tools ==="
+      - 'echo "=== Stage 7: Installing AI tools ==="'
       - brew bundle install --file=brew/07-ai.Brewfile --no-lock
 
   stage:7:verify:
@@ -182,7 +182,7 @@ tasks:
   stage:8:install:
     desc: "Install Stage 8 packages"
     cmds:
-      - echo "=== Stage 8: Installing security tools ==="
+      - 'echo "=== Stage 8: Installing security tools ==="'
       - brew bundle install --file=brew/08-security.Brewfile --no-lock
 
   stage:8:verify:
@@ -203,7 +203,7 @@ tasks:
   stage:9:install:
     desc: "Install Stage 9 packages"
     cmds:
-      - echo "=== Stage 9: Installing build tools ==="
+      - 'echo "=== Stage 9: Installing build tools ==="'
       - brew bundle install --file=brew/09-build.Brewfile --no-lock
 
   stage:9:verify:
@@ -510,7 +510,7 @@ tasks:
     desc: "Setup self-hosted runner on this Mac"
     cmds:
       - chmod +x ci/runner-local.sh
-      - echo "Run: ./ci/runner-local.sh <GITHUB_TOKEN> <REPO_URL>"
+      - 'echo "Run: ./ci/runner-local.sh <GITHUB_TOKEN> <REPO_URL>"'
 
   ci:runner:aws:
     desc: "Launch ephemeral runner on AWS via SkyPilot"
@@ -644,3 +644,71 @@ tasks:
         echo ""
         echo "Verify any stage with: task stage:N:verify"
         echo ""
+
+  # ===========================================================================
+  # VALIDATION TASKS
+  # ===========================================================================
+  validate:
+    desc: "Run all validation checks"
+    cmds:
+      - chmod +x scripts/validate.sh
+      - ./scripts/validate.sh
+
+  validate:taskfile:
+    desc: "Validate Taskfile.yml against JSON schema"
+    cmds:
+      - python3 -m check_jsonschema --builtin-schema vendor.taskfile Taskfile.yml
+
+  validate:brewfiles:
+    desc: "Validate all Brewfiles"
+    cmds:
+      - |
+        echo "=== Validating Brewfiles ==="
+        for f in Brewfile brew/*.Brewfile; do
+          if [ -f "$f" ]; then
+            ruby -c "$f" && echo "✓ $f"
+          fi
+        done
+      - |
+        echo "=== Checking for task/go-task conflict ==="
+        if grep -l 'brew "task"' Brewfile brew/*.Brewfile 2>/dev/null | grep -v "go-task"; then
+          echo "ERROR: Found 'brew \"task\"' - should be 'brew \"go-task\"'"
+          exit 1
+        fi
+        echo "✓ No naming conflicts"
+
+  validate:formulas:
+    desc: "Check if all Homebrew formulas exist"
+    cmds:
+      - |
+        echo "=== Checking formula availability ==="
+        for brewfile in brew/*.Brewfile; do
+          echo "Checking $brewfile..."
+          formulas=$(grep -E '^brew "' "$brewfile" | sed 's/brew "\([^"]*\)".*/\1/')
+          for formula in $formulas; do
+            if ! brew info "$formula" &>/dev/null; then
+              echo "ERROR: Formula not found: $formula"
+              exit 1
+            fi
+          done
+        done
+        echo "✓ All formulas exist"
+
+  validate:yaml:
+    desc: "Lint YAML files"
+    cmds:
+      - yamllint -d relaxed Taskfile.yml || true
+      - yamllint -d relaxed docker/*.yml || true
+      - yamllint -d relaxed .github/workflows/*.yml || true
+
+  hooks:install:
+    desc: "Install pre-commit hooks"
+    cmds:
+      - pip install pre-commit
+      - pre-commit install
+      - echo "✓ Pre-commit hooks installed"
+
+  hooks:run:
+    desc: "Run pre-commit on all files"
+    cmds:
+      - pre-commit run --all-files

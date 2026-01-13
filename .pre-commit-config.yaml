@@ -1,0 +1,56 @@
+# Pre-commit hooks for guilde-lite
+# Install: pip install pre-commit && pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # Taskfile.yml schema validation
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.30.0
+    hooks:
+      - id: check-taskfile
+        files: ^Taskfile\.ya?ml$
+
+  # YAML linting
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: [-d, relaxed, --format, parsable]
+        files: \.(ya?ml)$
+
+  # Shell script linting
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+        args: [-x]
+        files: \.sh$
+
+  # Trailing whitespace and EOF fixes
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--unsafe]
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: check-merge-conflict
+
+  # Ruby syntax check (for Brewfiles)
+  - repo: local
+    hooks:
+      - id: brewfile-syntax
+        name: Check Brewfile Ruby syntax
+        entry: ruby -c
+        language: system
+        files: (^Brewfile$|\.Brewfile$)
+        types: [text]
+
+      - id: brewfile-no-task
+        name: Check for task vs go-task conflict
+        entry: bash -c 'if grep -l "brew \"task\"" "$@" 2>/dev/null | grep -qv "go-task"; then echo "ERROR: Use go-task, not task (Taskwarrior)"; exit 1; fi'
+        language: system
+        files: (^Brewfile$|\.Brewfile$)
+        types: [text]
