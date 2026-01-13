@@ -8,7 +8,7 @@
 # =============================================================================
 
 # Go - Primary for orchestration, CLI tools, agents
-go = "1.24"
+go = "1.23"
 
 # Rust - Systems programming, performance-critical code
 rust = "latest"
@@ -45,8 +45,8 @@ uv = "latest"
 # PYTHON TOOLS (via pipx/uv)
 # =============================================================================
 
-# Type checker (Astral's ty - Ruff companion)
-"pipx:ty" = "latest"
+# Type checker (mypy for static type checking)
+"pipx:mypy" = "latest"
 
 # Ruff - Linter + formatter (replaces flake8, black, isort)
 "pipx:ruff" = "latest"
@@ -103,7 +103,7 @@ HOMEBREW_NO_ANALYTICS = "1"
 HOMEBREW_NO_ENV_HINTS = "1"
 
 # Docker (OrbStack)
-DOCKER_HOST = "unix:///Users/{{env.USER}}/.orbstack/run/docker.sock"
+DOCKER_HOST = "unix://{{env.HOME}}/.orbstack/run/docker.sock"
 
 # XDG Base Directory (standardize config locations)
 XDG_CONFIG_HOME = "{{env.HOME}}/.config"

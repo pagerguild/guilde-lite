@@ -4,7 +4,7 @@
 # =============================================================================
 # TAPS
 # =============================================================================
-tap "homebrew/bundle"
+tap "homebrew/cask-fonts"   # Required for Nerd Fonts
 tap "go-task/tap"           # Task runner (Make replacement)
 tap "common-fate/granted"   # Modern AWS SSO
 tap "oven-sh/bun"           # Bun runtime
@@ -95,6 +95,7 @@ brew "trivy"                # Security scanner
 # 10. BUILD TOOLS
 # =============================================================================
 brew "task"                 # Task runner (Make replacement)
+brew "golangci-lint"        # Go linter aggregator
 brew "cmake"
 brew "ninja"
 brew "ccache"               # Compiler cache

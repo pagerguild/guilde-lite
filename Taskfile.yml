@@ -240,7 +240,7 @@ tasks:
     desc: "Lint Python code"
     cmds:
       - uv run ruff check .
-      - uv run ty check . || true
+      - uv run mypy . || true
 
   lint:ts:
     desc: "Lint TypeScript code"
