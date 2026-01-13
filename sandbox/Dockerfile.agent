@@ -1,0 +1,51 @@
+# AI Agent Container Sandbox
+# Provides isolated environment for running AI coding agents
+# Build: docker build -f sandbox/Dockerfile.agent -t ai-sandbox .
+
+FROM ubuntu:24.04
+
+# Prevent interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Create non-root user for agent
+RUN groupadd -r agent && useradd -r -g agent -m -s /bin/bash agent
+
+# Install minimal tooling
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    git \
+    jq \
+    openssh-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install mise (runtime version manager)
+RUN curl https://mise.jdx.dev/install.sh | sh
+ENV PATH="/root/.local/bin:${PATH}"
+
+# Install Node.js via mise (for Claude Code)
+RUN mise install node@lts && mise use -g node@lts
+
+# Install Claude Code
+RUN npm install -g @anthropic-ai/claude-code
+
+# Install uv for Python
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Install Bun
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:${PATH}"
+
+# Create workspace directory
+RUN mkdir -p /workspace && chown agent:agent /workspace
+
+# Security: Remove unnecessary capabilities
+# These are handled at runtime via docker run --cap-drop
+
+# Switch to non-root user
+USER agent
+WORKDIR /workspace
+
+# Default command
+CMD ["bash"]

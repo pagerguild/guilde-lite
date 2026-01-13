@@ -1,0 +1,134 @@
+# mise.toml - Universal Runtime Version Management
+# Replaces: nvm, pyenv, goenv, rbenv, rustup (for version pinning)
+# https://mise.jdx.dev
+
+[tools]
+# =============================================================================
+# CORE LANGUAGES
+# =============================================================================
+
+# Go - Primary for orchestration, CLI tools, agents
+go = "1.24"
+
+# Rust - Systems programming, performance-critical code
+rust = "latest"
+
+# Python - AI/ML, scripting, data processing
+python = "3.12"
+
+# Node.js - Legacy tooling compatibility
+node = "lts"
+
+# =============================================================================
+# MODERN RUNTIMES (Drop-in replacements)
+# =============================================================================
+
+# Bun - Node.js/npm replacement for JS/TS
+# Faster package manager, runtime, bundler, test runner
+bun = "latest"
+
+# Astral UV - pip/pip-tools/virtualenv replacement
+# 10-100x faster Python package management
+uv = "latest"
+
+# =============================================================================
+# AI CODING TOOLS (via npm/bun)
+# =============================================================================
+
+# Claude Code - Anthropic's CLI coding assistant
+"npm:@anthropic-ai/claude-code" = "latest"
+
+# OpenAI Codex CLI (if available)
+# "npm:@openai/codex" = "latest"
+
+# =============================================================================
+# PYTHON TOOLS (via pipx/uv)
+# =============================================================================
+
+# Type checker (Astral's ty - Ruff companion)
+"pipx:ty" = "latest"
+
+# Ruff - Linter + formatter (replaces flake8, black, isort)
+"pipx:ruff" = "latest"
+
+# SkyPilot - Cloud compute orchestration
+"pipx:skypilot[aws]" = "latest"
+
+# =============================================================================
+# INFRASTRUCTURE TOOLS
+# =============================================================================
+
+# Terraform/OpenTofu
+terraform = "latest"
+
+# Pulumi (alternative IaC)
+# pulumi = "latest"
+
+# =============================================================================
+# ADDITIONAL LANGUAGE SUPPORT
+# =============================================================================
+
+# Java (for JVM-based tools if needed)
+# java = "21"
+
+# Ruby (for legacy tooling)
+# ruby = "3.3"
+
+# Zig (modern C alternative)
+# zig = "latest"
+
+# Deno (secure JS/TS runtime)
+deno = "latest"
+
+[env]
+# =============================================================================
+# GLOBAL ENVIRONMENT VARIABLES
+# =============================================================================
+
+# Go
+GO111MODULE = "on"
+GOPATH = "{{env.HOME}}/go"
+GOBIN = "{{env.HOME}}/go/bin"
+
+# Python - Force UV-managed environments
+UV_PYTHON_PREFERENCE = "only-managed"
+PYTHONDONTWRITEBYTECODE = "1"
+
+# Editor
+EDITOR = "cursor --wait"
+VISUAL = "cursor --wait"
+
+# Homebrew
+HOMEBREW_NO_ANALYTICS = "1"
+HOMEBREW_NO_ENV_HINTS = "1"
+
+# Docker (OrbStack)
+DOCKER_HOST = "unix:///Users/{{env.USER}}/.orbstack/run/docker.sock"
+
+# XDG Base Directory (standardize config locations)
+XDG_CONFIG_HOME = "{{env.HOME}}/.config"
+XDG_DATA_HOME = "{{env.HOME}}/.local/share"
+XDG_CACHE_HOME = "{{env.HOME}}/.cache"
+XDG_STATE_HOME = "{{env.HOME}}/.local/state"
+
+[settings]
+# Enable experimental features
+experimental = true
+
+# Trust all config files in this project
+trusted_config_paths = ["~/dev"]
+
+# Automatically install missing tools
+auto_install = true
+
+# Use shims for better shell integration
+shims_dir = "~/.local/share/mise/shims"
+
+[alias.python]
+# Shorthand aliases
+py312 = "3.12"
+py311 = "3.11"
+
+[alias.node]
+lts-iron = "20"
+lts-hydrogen = "18"

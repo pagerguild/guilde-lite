@@ -1,0 +1,311 @@
+# Taskfile.yml - Automation Engine
+# Modern Make replacement written in Go
+# Docs: https://taskfile.dev
+# Usage: task <command>
+
+version: '3'
+
+vars:
+  PROJECT_DIR: '{{.USER_WORKING_DIR}}'
+  CONFIG_DIR: '{{.HOME}}/.config'
+
+# =============================================================================
+# SETUP TASKS
+# =============================================================================
+tasks:
+  default:
+    desc: "Show available tasks"
+    cmds:
+      - task --list
+
+  setup:
+    desc: "Full environment setup (Day 1)"
+    cmds:
+      - task: brew
+      - task: runtimes
+      - task: configs
+      - task: verify
+    silent: false
+
+  brew:
+    desc: "Install system dependencies via Homebrew"
+    cmds:
+      - echo "Installing Homebrew packages..."
+      - brew bundle install --file=Brewfile --no-lock
+    status:
+      - test -f /opt/homebrew/bin/mise
+
+  runtimes:
+    desc: "Install language runtimes via mise"
+    cmds:
+      - echo "Installing runtimes via mise..."
+      - mise install --yes
+      - task: ai-tools
+    status:
+      - mise current go
+
+  ai-tools:
+    desc: "Install AI coding tools"
+    internal: true
+    cmds:
+      - echo "Installing AI tools..."
+      - npm install -g @anthropic-ai/claude-code || true
+      # Add other AI tools as they become available
+
+  configs:
+    desc: "Apply configuration files"
+    cmds:
+      - task: config:ghostty
+      - task: config:tmux
+      - task: config:shell
+      - task: config:git
+
+  config:ghostty:
+    desc: "Install Ghostty configuration"
+    cmds:
+      - mkdir -p {{.CONFIG_DIR}}/ghostty
+      - cp config/ghostty.conf {{.CONFIG_DIR}}/ghostty/config
+      - echo "Ghostty config installed to {{.CONFIG_DIR}}/ghostty/config"
+
+  config:tmux:
+    desc: "Install tmux configuration"
+    cmds:
+      - cp config/tmux.conf {{.HOME}}/.tmux.conf
+      - |
+        if [ ! -d ~/.tmux/plugins/tpm ]; then
+          git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+        fi
+      - ~/.tmux/plugins/tpm/bin/install_plugins || true
+      - echo "Tmux config installed"
+
+  config:shell:
+    desc: "Configure shell (zsh)"
+    cmds:
+      - |
+        grep -q "mise activate zsh" ~/.zshrc 2>/dev/null || echo 'eval "$(mise activate zsh)"' >> ~/.zshrc
+        grep -q "starship init zsh" ~/.zshrc 2>/dev/null || echo 'eval "$(starship init zsh)"' >> ~/.zshrc
+        grep -q "zoxide init zsh" ~/.zshrc 2>/dev/null || echo 'eval "$(zoxide init zsh)"' >> ~/.zshrc
+      - echo "Shell config updated"
+
+  config:git:
+    desc: "Configure git with modern defaults"
+    cmds:
+      - git config --global init.defaultBranch main
+      - git config --global pull.rebase true
+      - git config --global fetch.prune true
+      - git config --global diff.colorMoved zebra
+      - git config --global core.pager delta
+      - git config --global interactive.diffFilter "delta --color-only"
+      - git config --global merge.conflictstyle diff3
+      - git config --global diff.algorithm histogram
+      - echo "Git config updated"
+
+  verify:
+    desc: "Verify environment setup"
+    cmds:
+      - echo "Verifying environment..."
+      - go version || echo "Go not installed"
+      - rustc --version || echo "Rust not installed"
+      - python --version || echo "Python not installed"
+      - bun --version || echo "Bun not installed"
+      - uv --version || echo "uv not installed"
+      - claude --version || echo "Claude Code not installed"
+      - echo "Environment verified!"
+
+  # ===========================================================================
+  # DATABASE TASKS
+  # ===========================================================================
+  db:up:
+    desc: "Start all databases"
+    cmds:
+      - docker compose -f docker/docker-compose.yml up -d
+      - echo "Databases starting..."
+      - task: db:wait
+
+  db:down:
+    desc: "Stop all databases"
+    cmds:
+      - docker compose -f docker/docker-compose.yml down
+
+  db:reset:
+    desc: "Reset all databases (destructive)"
+    cmds:
+      - docker compose -f docker/docker-compose.yml down -v
+      - task: db:up
+
+  db:wait:
+    desc: "Wait for databases to be ready"
+    internal: true
+    cmds:
+      - |
+        echo "Waiting for PostgreSQL..."
+        until docker exec dev-postgres pg_isready -U dev; do sleep 1; done
+        echo "Waiting for Redis..."
+        until docker exec dev-redis redis-cli -a dev ping; do sleep 1; done
+        echo "All databases ready!"
+
+  db:psql:
+    desc: "Connect to PostgreSQL"
+    cmds:
+      - docker exec -it dev-postgres psql -U dev
+
+  db:redis:
+    desc: "Connect to Redis CLI"
+    cmds:
+      - docker exec -it dev-redis redis-cli -a dev
+
+  # ===========================================================================
+  # SANDBOX TASKS (AI Agent Isolation)
+  # ===========================================================================
+  sandbox:basic:
+    desc: "Run command in basic sandbox (file restrictions)"
+    cmds:
+      - |
+        sandbox-exec -f sandbox/basic.sb \
+          -D HOME="$HOME" \
+          -D PROJECT_DIR="{{.PROJECT_DIR}}" \
+          {{.CLI_ARGS}}
+
+  sandbox:container:
+    desc: "Run command in container sandbox"
+    cmds:
+      - |
+        docker run --rm -it \
+          --cap-drop=ALL \
+          --cap-add=CHOWN \
+          --cap-add=SETUID \
+          --cap-add=SETGID \
+          --security-opt=no-new-privileges \
+          --network=host \
+          -v "{{.PROJECT_DIR}}:/workspace:rw" \
+          -v "$HOME/.config/claude:/home/agent/.config/claude:ro" \
+          -w /workspace \
+          ai-sandbox \
+          {{.CLI_ARGS}}
+
+  sandbox:vm:
+    desc: "Run command in OrbStack Linux VM (full isolation)"
+    cmds:
+      - |
+        orb run -m ubuntu \
+          -v "{{.PROJECT_DIR}}:/workspace" \
+          -- {{.CLI_ARGS}}
+
+  sandbox:build:
+    desc: "Build sandbox container image"
+    cmds:
+      - docker build -f sandbox/Dockerfile.agent -t ai-sandbox .
+
+  # ===========================================================================
+  # CI/CD TASKS
+  # ===========================================================================
+  ci:local:
+    desc: "Run CI locally (same as GitHub Actions)"
+    cmds:
+      - task: lint
+      - task: test
+      - task: build
+
+  ci:runner:local:
+    desc: "Setup self-hosted runner on this Mac"
+    cmds:
+      - chmod +x ci/runner-local.sh
+      - echo "Run: ./ci/runner-local.sh <GITHUB_TOKEN> <REPO_URL>"
+
+  ci:runner:aws:
+    desc: "Launch ephemeral runner on AWS via SkyPilot"
+    cmds:
+      - |
+        sky launch ci/runner-aws.yaml \
+          --env GITHUB_TOKEN="${GITHUB_TOKEN}" \
+          --env REPO_URL="${REPO_URL}"
+
+  # ===========================================================================
+  # DEVELOPMENT TASKS
+  # ===========================================================================
+  lint:
+    desc: "Run all linters"
+    cmds:
+      - task: lint:go
+      - task: lint:python
+      - task: lint:ts
+
+  lint:go:
+    desc: "Lint Go code"
+    cmds:
+      - go vet ./...
+      - golangci-lint run || true
+
+  lint:python:
+    desc: "Lint Python code"
+    cmds:
+      - uv run ruff check .
+      - uv run ty check . || true
+
+  lint:ts:
+    desc: "Lint TypeScript code"
+    cmds:
+      - bun run lint || true
+
+  test:
+    desc: "Run all tests"
+    cmds:
+      - task: test:go
+      - task: test:python
+      - task: test:ts
+
+  test:go:
+    desc: "Run Go tests"
+    cmds:
+      - go test -v -race ./...
+
+  test:python:
+    desc: "Run Python tests"
+    cmds:
+      - uv run pytest -v
+
+  test:ts:
+    desc: "Run TypeScript tests"
+    cmds:
+      - bun test
+
+  build:
+    desc: "Build all artifacts"
+    cmds:
+      - echo "Build tasks go here..."
+
+  # ===========================================================================
+  # AWS TASKS
+  # ===========================================================================
+  aws:login:
+    desc: "Login to AWS via Granted"
+    cmds:
+      - assume
+
+  aws:ssm:
+    desc: "Connect to EC2 via SSM (no SSH keys needed)"
+    cmds:
+      - |
+        if [ -z "{{.CLI_ARGS}}" ]; then
+          echo "Usage: task aws:ssm -- i-instanceid"
+          exit 1
+        fi
+        aws ssm start-session --target {{.CLI_ARGS}}
+
+  # ===========================================================================
+  # CLEANUP TASKS
+  # ===========================================================================
+  clean:
+    desc: "Clean build artifacts and caches"
+    cmds:
+      - go clean -cache
+      - uv cache clean
+      - bun pm cache rm
+      - docker system prune -f
+
+  clean:all:
+    desc: "Deep clean (includes databases)"
+    cmds:
+      - task: clean
+      - task: db:down
+      - docker volume prune -f

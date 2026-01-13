@@ -1,0 +1,118 @@
+{
+  "$schema": "https://claude.ai/code/settings-schema.json",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "LS"
+    ],
+    "deny": [],
+    "askEveryTime": [
+      "Bash",
+      "Write",
+      "Edit",
+      "WebFetch",
+      "WebSearch"
+    ]
+  },
+  "bash": {
+    "blockedCommands": [
+      "rm -rf /",
+      "rm -rf ~",
+      "rm -rf /*",
+      "sudo rm",
+      ":(){ :|:& };:",
+      "chmod -R 777 /",
+      "curl | sh",
+      "curl | bash",
+      "wget | sh",
+      "wget | bash",
+      "eval",
+      "> /dev/sda",
+      "mkfs",
+      "dd if=",
+      "shutdown",
+      "reboot",
+      "halt",
+      "poweroff",
+      "init 0",
+      "init 6",
+      "systemctl poweroff",
+      "systemctl reboot",
+      "launchctl",
+      "networksetup",
+      "security delete",
+      "security unlock",
+      "dscl . -delete",
+      "defaults write com.apple",
+      "open -a Terminal",
+      "osascript",
+      "npm publish",
+      "pip upload",
+      "twine upload",
+      "cargo publish",
+      "git push --force origin main",
+      "git push --force origin master",
+      "git push -f origin main",
+      "git push -f origin master",
+      "aws iam",
+      "aws organizations",
+      "aws sts assume-role",
+      "gcloud iam",
+      "az ad",
+      "kubectl delete namespace",
+      "kubectl delete -A",
+      "helm delete",
+      "docker system prune -a",
+      "docker rm -f $(docker ps -aq)"
+    ],
+    "blockedPatterns": [
+      ".*>\\/dev\\/.*",
+      ".*\\|\\s*sh\\s*$",
+      ".*\\|\\s*bash\\s*$",
+      ".*base64.*\\|.*",
+      ".*--force.*main.*",
+      ".*--force.*master.*",
+      ".*-f.*origin.*main.*",
+      ".*-f.*origin.*master.*"
+    ],
+    "allowedDirectories": [
+      "{{PROJECT_DIR}}",
+      "/tmp",
+      "{{HOME}}/.cache"
+    ],
+    "timeout": 120000,
+    "maxOutputSize": 100000
+  },
+  "network": {
+    "allowedDomains": [
+      "api.anthropic.com",
+      "api.openai.com",
+      "github.com",
+      "api.github.com",
+      "raw.githubusercontent.com",
+      "registry.npmjs.org",
+      "pypi.org",
+      "crates.io",
+      "pkg.go.dev",
+      "proxy.golang.org"
+    ],
+    "blockedDomains": [
+      "*.onion",
+      "pastebin.com",
+      "hastebin.com",
+      "transfer.sh"
+    ]
+  },
+  "hooks": {
+    "preToolUse": {
+      "Bash": {
+        "command": "echo 'Executing: {{command}}' >> /tmp/claude-audit.log"
+      },
+      "Write": {
+        "command": "echo 'Writing to: {{file_path}}' >> /tmp/claude-audit.log"
+      }
+    }
+  }
+}

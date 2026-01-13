@@ -1,0 +1,50 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.local
+
+# Secrets (NEVER commit these)
+*.pem
+*.key
+credentials.json
+secrets.yaml
+.secrets/
+
+# Build artifacts
+dist/
+build/
+out/
+*.egg-info/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+coverage/
+node_modules/
+.bun/
+target/
+bin/
+
+# Logs
+*.log
+logs/
+
+# Runtime data
+*.pid
+*.sock
+
+# IDE/Tool specific
+.task/
+.mise.toml.local

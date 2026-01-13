@@ -1,0 +1,69 @@
+;; macOS Sandbox Profile for AI Agents
+;; Usage: sandbox-exec -f basic.sb <command>
+;; This restricts file access and network to specific paths/domains
+
+(version 1)
+
+;; Start with deny-all
+(deny default)
+
+;; Allow basic process operations
+(allow process-fork)
+(allow process-exec)
+(allow signal)
+
+;; Allow reading system libraries and frameworks
+(allow file-read*
+    (subpath "/System")
+    (subpath "/Library/Frameworks")
+    (subpath "/usr/lib")
+    (subpath "/usr/share")
+    (subpath "/private/var/db/timezone")
+    (literal "/dev/null")
+    (literal "/dev/random")
+    (literal "/dev/urandom")
+    (literal "/dev/zero"))
+
+;; Allow Homebrew binaries (read-only)
+(allow file-read*
+    (subpath "/opt/homebrew")
+    (subpath "/usr/local"))
+
+;; Allow reading user shell configs
+(allow file-read*
+    (literal (string-append (param "HOME") "/.zshrc"))
+    (literal (string-append (param "HOME") "/.zshenv"))
+    (literal (string-append (param "HOME") "/.zprofile"))
+    (literal (string-append (param "HOME") "/.bashrc"))
+    (literal (string-append (param "HOME") "/.bash_profile")))
+
+;; Allow mise/tool shims
+(allow file-read*
+    (subpath (string-append (param "HOME") "/.local/share/mise")))
+
+;; CRITICAL: Only allow file writes to specific project directory
+;; This path should be set via parameter
+(allow file-write* file-read*
+    (subpath (param "PROJECT_DIR")))
+
+;; Allow temp directory access
+(allow file-write* file-read*
+    (subpath "/private/tmp")
+    (subpath (string-append (param "HOME") "/.cache")))
+
+;; Network: Only allow specific domains
+(allow network-outbound
+    (remote tcp "*:443")  ; HTTPS only
+    (remote tcp "*:22"))  ; SSH/Git
+
+;; DNS resolution
+(allow network-outbound (literal "/private/var/run/mDNSResponder"))
+
+;; Allow sysctl for basic system info
+(allow sysctl-read)
+
+;; Allow mach lookups for basic services
+(allow mach-lookup
+    (global-name "com.apple.SecurityServer")
+    (global-name "com.apple.system.logger")
+    (global-name "com.apple.CoreServices.coreservicesd"))

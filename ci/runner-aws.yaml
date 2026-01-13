@@ -1,0 +1,63 @@
+# SkyPilot task for ephemeral GitHub Actions runner on AWS
+# Usage: sky launch ci/runner-aws.yaml --env GITHUB_TOKEN=ghp_xxx --env REPO_URL=https://github.com/org/repo
+
+resources:
+  cloud: aws
+  region: us-west-2
+  instance_type: c7g.xlarge  # ARM64 Graviton for cost efficiency
+  use_spot: true             # Use spot instances (70% cheaper)
+  disk_size: 50
+
+file_mounts:
+  /tmp/setup-runner.sh: |
+    #!/bin/bash
+    set -euo pipefail
+
+    RUNNER_VERSION="2.321.0"
+
+    # Install dependencies
+    sudo apt-get update
+    sudo apt-get install -y curl jq
+
+    # Install mise
+    curl https://mise.jdx.dev/install.sh | sh
+    export PATH="$HOME/.local/bin:$PATH"
+
+    # Install runtimes
+    mise install go@1.24 python@3.12 bun@latest rust@latest
+    mise use -g go@1.24 python@3.12 bun@latest rust@latest
+
+    # Install uv
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+
+    # Download GitHub runner
+    cd /tmp
+    curl -sL "https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-arm64-${RUNNER_VERSION}.tar.gz" | tar xz
+
+    # Get registration token
+    REG_TOKEN=$(curl -sX POST \
+        -H "Authorization: token ${GITHUB_TOKEN}" \
+        -H "Accept: application/vnd.github+json" \
+        "${REPO_URL}/actions/runners/registration-token" | jq -r '.token')
+
+    # Configure runner
+    ./config.sh \
+        --url "$REPO_URL" \
+        --token "$REG_TOKEN" \
+        --name "aws-runner-$(hostname)" \
+        --labels "self-hosted,Linux,ARM64,self-hosted-aws" \
+        --work "_work" \
+        --ephemeral
+
+    # Run (will exit after one job due to --ephemeral)
+    ./run.sh
+
+setup: |
+  chmod +x /tmp/setup-runner.sh
+
+run: |
+  /tmp/setup-runner.sh
+
+envs:
+  GITHUB_TOKEN:
+  REPO_URL:
