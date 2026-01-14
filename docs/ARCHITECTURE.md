@@ -1078,21 +1078,171 @@ task config:tmux
 # Auto-installs TPM (plugin manager)
 ```
 
-### Shell Configuration (Zsh)
+### Shell Configuration (Zsh + Oh-My-Zsh + mise)
 
-**What Gets Modified**: `~/.zshrc`
+The shell configuration follows a three-file architecture optimized for mise integration with oh-my-zsh.
 
-**Additions**:
-```bash
-# mise activation (runtime manager)
-eval "$(mise activate zsh)"
+#### File Loading Order
 
-# Starship prompt (modern replacement for oh-my-zsh theme)
-eval "$(starship init zsh)"
-
-# Zoxide (smart cd replacement)
-eval "$(zoxide init zsh)"
 ```
+~/.zshenv    → ALL zsh invocations (scripts, cron, SSH)
+~/.zprofile  → Login shells only (new terminals, SSH login)
+~/.zshrc     → Interactive shells only (user sessions)
+```
+
+**Critical Design Principle**: Keep `.zshenv` minimal since it runs for every zsh process.
+
+#### ~/.zshenv (Minimal - ALL Contexts)
+
+```bash
+# Add mise shims to PATH for non-interactive contexts (scripts, cron)
+if [[ -d "$HOME/.local/share/mise/shims" ]]; then
+  export PATH="$HOME/.local/share/mise/shims:$PATH"
+fi
+
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+# Local overrides (always exits cleanly)
+[[ -f ~/.zshenv.local ]] && source ~/.zshenv.local || true
+```
+
+**Why shims in .zshenv?**: Scripts and cron jobs need access to mise-managed tools without full mise activation.
+
+#### ~/.zprofile (Login Shells)
+
+```bash
+# Initialize Homebrew (required for mise and other brew-installed tools)
+if [[ -f /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -f /usr/local/bin/brew ]]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+
+# Mise shims for SSH sessions and non-interactive login contexts
+if command -v mise &> /dev/null; then
+  eval "$(mise activate --shims zsh)"
+fi
+
+# Local overrides
+[[ -f ~/.zprofile.local ]] && source ~/.zprofile.local || true
+```
+
+#### ~/.zshrc (Interactive Shells with Oh-My-Zsh)
+
+**Oh-My-Zsh Plugin Selection** (12 plugins for guilde-lite stack):
+
+```bash
+plugins=(
+  # --- Package Managers ---
+  brew            # Homebrew: aliases (bi, bup, bcin) + auto shellenv setup
+
+  # --- Version Management ---
+  mise            # Universal version manager (~60ms, replaces nvm/pyenv/rbenv)
+
+  # --- Version Control ---
+  git             # Git: 150+ aliases (ga, gc, gp, gl, gst, etc.)
+  gh              # GitHub CLI: completions for gh command
+
+  # --- Languages (completions only - versions via mise) ---
+  golang          # Go: aliases (gob, gor, got, gomt) + completions
+  rust            # Rust: completions for rustc, cargo, rustup
+
+  # --- JavaScript/TypeScript Runtimes ---
+  bun             # Bun: completions (cached)
+
+  # --- Python Tools ---
+  uv              # Astral UV: aliases (uva, uvs, uvpy) + completions
+
+  # --- Containers & Infrastructure ---
+  docker          # Docker: 40+ aliases (dps, drit, etc.) + completions
+  docker-compose  # Docker Compose: completions
+  terraform       # Terraform: aliases (tf, tfa, tfp) + prompt function
+
+  # --- macOS ---
+  macos           # macOS: aliases (ofd, pfd, quick-look, etc.)
+)
+```
+
+**Key Aliases Provided by Plugins**:
+- `bi` (brew install), `bup` (brew upgrade)
+- `gst` (git status), `gco` (git checkout), `gp` (git push)
+- `dps` (docker ps), `drit` (docker run -it)
+- `tf` (terraform), `tfa` (terraform apply)
+- `mi` (mise install), `mls` (mise ls)
+- `uva` (uv add), `uvs` (uv sync), `uvr` (uv run)
+
+#### noglob Aliases (Expected Behavior)
+
+Some oh-my-zsh plugins create `noglob` aliases to prevent shell glob expansion:
+
+```bash
+# The uv plugin creates:
+alias uv="noglob uv"
+
+# Similarly, pip plugin creates:
+alias pip="noglob pip"
+```
+
+**Why `noglob`?** Tools like `uv` and `pip` use bracket syntax for package extras:
+```bash
+uv add package[extra]    # Without noglob, shell tries to glob [extra]
+pip install package[dev] # Same issue
+```
+
+**Is this a problem?** No! When you run `which uv` and see:
+```
+uv: aliased to noglob uv
+```
+
+This is **expected and correct behavior**. The tool executes normally - `noglob` just prevents shell expansion before passing arguments to the command.
+
+**Verification**: Run `uv --version` - it works correctly despite the alias.
+
+#### mise Integration Design
+
+**Why the oh-my-zsh mise plugin?**
+- The mise plugin calls `eval "$(mise activate zsh)"`
+- This creates a **shell function wrapper** (expected behavior)
+- The function is required for `mise shell` and `mise deactivate` to work
+
+**Verification**: `type mise` should show "mise is a shell function"
+
+#### Exit Code Pattern
+
+**Critical**: All local override lines must use `|| true` to prevent exit code 1 when files don't exist:
+
+```bash
+# WRONG - exits with code 1 if file doesn't exist
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
+# CORRECT - always exits cleanly
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local || true
+```
+
+This pattern is used in all three shell config files to ensure:
+- Interactive shells start successfully
+- Shell tests pass (`zsh -i -c 'command'`)
+- Scripts that source shell configs don't fail unexpectedly
+
+#### Shell Configuration Validation
+
+Run the comprehensive shell test suite:
+
+```bash
+task validate:shell
+```
+
+**Tests performed** (52 checks):
+1. Shell file exit codes (.zshenv, .zprofile, .zshrc)
+2. Interactive shell starts successfully
+3. All 12 oh-my-zsh plugins load correctly
+4. All tools available via `command -v` (brew, mise, git, gh, go, rustc, node, bun, python, uv, docker, terraform)
+5. Key aliases defined (bi, gst, tf, dps, mi, mls)
+6. Environment variables set (HOMEBREW_PREFIX, MISE_SHELL, LANG)
+7. Mise tool versions installed (bun, node, python, go, rust, deno, terraform, uv)
+8. Tool execution works (including aliased tools like `uv` with noglob wrapper)
+9. All shell contexts work (interactive login, non-interactive login, non-interactive)
 
 **Design Decision**: Append-only
 - Never overwrites existing `.zshrc`

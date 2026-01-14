@@ -65,17 +65,18 @@ if command -v mise &>/dev/null; then
     mise_output=$(mise ls 2>&1)
     if echo "$mise_output" | grep -q "WARN"; then
         log_error "mise.toml has warnings:"
-        echo "$mise_output" | grep "WARN" | while read line; do log_info "  $line"; done
+        echo "$mise_output" | grep "WARN" | while read -r line; do log_info "  $line"; done
     else
         log_success "mise.toml: No deprecation warnings"
     fi
 
     # Validate mise.toml schema (if check-jsonschema available)
+    # Note: Online schema may lag behind mise features - mise ls warnings are authoritative
     if python3 -c "import check_jsonschema" 2>/dev/null; then
         if python3 -m check_jsonschema --schemafile "https://mise.jdx.dev/schema/mise.json" mise.toml 2>/dev/null; then
             log_success "mise.toml: Schema validation passed"
         else
-            log_warn "mise.toml: Schema validation issues (may be false positive)"
+            log_info "mise.toml: Schema validation notes (online schema may be outdated)"
         fi
     fi
 else
@@ -94,8 +95,9 @@ mise_managed_tools="bun node python go rust deno terraform uv"
 conflicts_found=false
 
 for tool in $mise_managed_tools; do
-    # Check if installed via Homebrew
-    if brew list "$tool" &>/dev/null 2>&1; then
+    # Check if installed via Homebrew (exact match only)
+    # Use --formula to get exact match, not partial (e.g., python vs python@3.14)
+    if brew list --formula 2>/dev/null | grep -qx "$tool"; then
         log_error "CONFLICT: $tool installed via Homebrew (should use mise)"
         log_info "  Fix: brew uninstall $tool && mise install $tool"
         conflicts_found=true
@@ -142,7 +144,8 @@ echo ""
 echo "--- Checking for common mistakes ---"
 
 # Check for task vs go-task conflict
-if grep -l 'brew "task"' Brewfile brew/*.Brewfile 2>/dev/null | grep -v "go-task"; then
+# Use word boundary to match exact 'brew "task"' but not 'brew "go-task"'
+if grep -E 'brew "[^"]*\btask"' Brewfile brew/*.Brewfile 2>/dev/null | grep -v 'go-task'; then
     log_error "Found 'brew \"task\"' (Taskwarrior) - should be 'brew \"go-task\"'"
 else
     log_success "No task/go-task naming conflict"
@@ -161,7 +164,7 @@ for brewfile in Brewfile brew/*.Brewfile; do
         dupes=$(grep -E '^(brew|cask|tap) ' "$brewfile" | sort | uniq -d)
         if [ -n "$dupes" ]; then
             log_error "$brewfile: Duplicate entries found:"
-            echo "$dupes" | while read line; do log_info "  $line"; done
+            echo "$dupes" | while read -r line; do log_info "  $line"; done
         fi
     fi
 done
@@ -174,7 +177,8 @@ echo ""
 echo "--- Validating YAML files ---"
 
 if command -v yamllint &>/dev/null; then
-    for yaml in Taskfile.yml mise.toml docker/*.yml .github/workflows/*.yml; do
+    # Note: mise.toml is TOML, not YAML - validated separately via mise.jdx.dev schema
+    for yaml in Taskfile.yml docker/*.yml .github/workflows/*.yml; do
         if [ -f "$yaml" ]; then
             if yamllint -d relaxed "$yaml" &>/dev/null; then
                 log_success "$yaml: YAML lint passed"
@@ -219,14 +223,14 @@ if command -v brew &>/dev/null; then
     # Check if all formulas exist
     echo "Checking if all formulas/casks exist in Homebrew..."
 
-    for brewfile in brew/01-core.Brewfile; do
+    for brewfile in Brewfile brew/*.Brewfile; do
         if [ -f "$brewfile" ]; then
             # Extract formula names and check each one
             formulas=$(grep -E '^brew "' "$brewfile" | sed 's/brew "\([^"]*\)".*/\1/')
             all_exist=true
             for formula in $formulas; do
                 if ! brew info "$formula" &>/dev/null; then
-                    log_error "Formula not found: $formula"
+                    log_error "Formula not found in $brewfile: $formula"
                     all_exist=false
                 fi
             done

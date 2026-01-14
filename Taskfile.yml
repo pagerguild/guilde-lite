@@ -41,6 +41,7 @@ tasks:
     cmds:
       - echo "=== Verifying Stage 1 ==="
       - command -v git && git --version
+      - command -v git-lfs && git-lfs --version | head -1
       - command -v jj && jj --version
       - command -v just && just --version
       - command -v mise && mise --version
@@ -70,6 +71,15 @@ tasks:
       - command -v fzf && fzf --version
       - command -v jq && jq --version
       - command -v starship && starship --version
+      - command -v yq && yq --version | head -1
+      - command -v dust && dust --version | head -1
+      - command -v duf && duf --version | head -1
+      - command -v procs && procs --version | head -1
+      - command -v btm && btm --version | head -1
+      - command -v hyperfine && hyperfine --version | head -1
+      - command -v xh && xh --version | head -1
+      - command -v sd && sd --version | head -1
+      - command -v tokei && tokei --version | head -1
       - echo "✓ Stage 2 complete"
 
   stage:3:
@@ -90,6 +100,8 @@ tasks:
       - echo "=== Verifying Stage 3 ==="
       - command -v tmux && tmux -V
       - test -d "/Applications/Ghostty.app" && echo "Ghostty installed" || echo "Ghostty not found (may need manual install)"
+      - command -v zellij && zellij --version | head -1 || true
+      - fc-list 2>/dev/null | grep -qi "JetBrainsMono Nerd" && echo "✓ Nerd Font installed" || echo "⚠ Nerd Font not found"
       - echo "✓ Stage 3 complete"
 
   stage:4:
@@ -112,6 +124,9 @@ tasks:
       - command -v docker && docker --version || echo "Docker CLI not available (start OrbStack)"
       - command -v kubectl && kubectl version --client 2>/dev/null | head -1 || true
       - command -v helm && helm version --short || true
+      - command -v kubectx && echo "kubectx available" || true
+      - command -v k9s && k9s version --short 2>/dev/null || true
+      - command -v lazydocker && lazydocker --version | head -1 || true
       - echo "✓ Stage 4 complete"
 
   stage:5:
@@ -152,6 +167,7 @@ tasks:
       - echo "=== Verifying Stage 6 ==="
       - command -v aws && aws --version
       - command -v granted && granted --version || echo "granted installed (use 'assume' command)"
+      - command -v session-manager-plugin && echo "SSM plugin available" || echo "⚠ SSM plugin not installed"
       - echo "✓ Stage 6 complete"
 
   stage:7:
@@ -192,6 +208,7 @@ tasks:
       - command -v age && age --version
       - command -v sops && sops --version | head -1
       - command -v trivy && trivy --version | head -1
+      - command -v cosign && cosign version 2>/dev/null | head -1
       - echo "✓ Stage 8 complete"
 
   stage:9:
@@ -213,6 +230,7 @@ tasks:
       - command -v cmake && cmake --version | head -1
       - command -v ninja && ninja --version
       - command -v golangci-lint && golangci-lint --version | head -1
+      - command -v ccache && ccache --version | head -1
       - echo "✓ Stage 9 complete"
 
   stage:runtimes:
@@ -237,6 +255,8 @@ tasks:
       - python --version || echo "Python not installed"
       - bun --version || echo "Bun not installed"
       - uv --version || echo "uv not installed"
+      - deno --version | head -1 || echo "Deno not installed"
+      - terraform --version | head -1 || echo "Terraform not installed"
       - echo "✓ Runtimes complete"
 
   stage:configs:
@@ -650,6 +670,16 @@ tasks:
   # ===========================================================================
   validate:
     desc: "Run all validation checks"
+    deps:
+      - validate:taskfile
+      - validate:mise
+      - validate:brewfiles
+      - validate:runtimes
+    cmds:
+      - echo "✓ All validation checks passed"
+
+  validate:all:
+    desc: "Run comprehensive validation (includes slow checks)"
     cmds:
       - chmod +x scripts/validate.sh
       - ./scripts/validate.sh
@@ -684,28 +714,43 @@ tasks:
         done
       - |
         echo "=== Checking for task/go-task conflict ==="
-        if grep -l 'brew "task"' Brewfile brew/*.Brewfile 2>/dev/null | grep -v "go-task"; then
-          echo "ERROR: Found 'brew \"task\"' - should be 'brew \"go-task\"'"
+        # Use word boundary to match exact 'brew "task"' but not 'brew "go-task"'
+        if grep -E 'brew "[^"]*\btask"' Brewfile brew/*.Brewfile 2>/dev/null | grep -v 'go-task'; then
+          echo "ERROR: Found 'brew \"task\"' (Taskwarrior) - should be 'brew \"go-task\"'"
           exit 1
         fi
-        echo "✓ No naming conflicts"
+        echo "✓ No task/go-task naming conflicts"
 
   validate:formulas:
     desc: "Check if all Homebrew formulas exist"
     cmds:
       - |
         echo "=== Checking formula availability ==="
-        for brewfile in brew/*.Brewfile; do
-          echo "Checking $brewfile..."
-          formulas=$(grep -E '^brew "' "$brewfile" | sed 's/brew "\([^"]*\)".*/\1/')
-          for formula in $formulas; do
-            if ! brew info "$formula" &>/dev/null; then
-              echo "ERROR: Formula not found: $formula"
-              exit 1
-            fi
-          done
+        errors=0
+        for brewfile in Brewfile brew/*.Brewfile; do
+          if [ -f "$brewfile" ]; then
+            echo "Checking $brewfile..."
+            formulas=$(grep -E '^brew "' "$brewfile" | sed 's/brew "\([^"]*\)".*/\1/')
+            for formula in $formulas; do
+              if ! brew info "$formula" &>/dev/null; then
+                echo "ERROR: Formula not found in $brewfile: $formula"
+                errors=$((errors + 1))
+              fi
+            done
+            casks=$(grep -E '^cask "' "$brewfile" | sed 's/cask "\([^"]*\)".*/\1/')
+            for cask in $casks; do
+              if ! brew info --cask "$cask" &>/dev/null; then
+                echo "ERROR: Cask not found in $brewfile: $cask"
+                errors=$((errors + 1))
+              fi
+            done
+          fi
         done
-        echo "✓ All formulas exist"
+        if [ $errors -gt 0 ]; then
+          echo "ERROR: $errors formula/cask(s) not found"
+          exit 1
+        fi
+        echo "✓ All formulas and casks exist"
 
   validate:yaml:
     desc: "Lint YAML files"
@@ -713,6 +758,65 @@ tasks:
       - yamllint -d relaxed Taskfile.yml || true
       - yamllint -d relaxed docker/*.yml || true
       - yamllint -d relaxed .github/workflows/*.yml || true
+
+  validate:runtimes:
+    desc: "Verify mise-managed runtimes are installed correctly"
+    cmds:
+      - |
+        echo "=== Verifying mise-managed runtimes ==="
+        errors=0
+        warnings=0
+
+        # Tools that should be managed by mise (not Homebrew)
+        # Format: tool_name:binary_name (binary defaults to tool_name if not specified)
+        mise_tools="bun node python go rust:rustc deno terraform uv"
+
+        for entry in $mise_tools; do
+          tool="${entry%%:*}"
+          binary="${entry#*:}"
+          # If no colon, binary equals tool
+          if [ "$binary" = "$entry" ]; then
+            binary="$tool"
+          fi
+
+          # Check if installed via Homebrew (exact match only)
+          # Use --formula to get exact match, not partial (e.g., python vs python@3.14)
+          if brew list --formula 2>/dev/null | grep -qx "$tool"; then
+            echo "ERROR: $tool installed via Homebrew (should use mise)"
+            echo "  Fix: brew uninstall $tool && mise install $tool"
+            errors=$((errors + 1))
+          fi
+
+          # Check if mise has this tool configured
+          if grep -q "^$tool\s*=" mise.toml 2>/dev/null; then
+            # Use mise ls to check if installed (works for all tools)
+            if ! mise ls "$tool" 2>/dev/null | grep -q "$tool"; then
+              echo "WARNING: $tool configured in mise.toml but not installed"
+              echo "  Fix: mise install $tool"
+              warnings=$((warnings + 1))
+            else
+              version=$(mise ls "$tool" 2>/dev/null | awk '{print $2}')
+              echo "✓ $tool: $version"
+            fi
+          fi
+        done
+
+        # Check for manual bun installation
+        if [ -d "$HOME/.bun" ]; then
+          echo "ERROR: Manual bun installation found at ~/.bun"
+          echo "  Fix: rm -rf ~/.bun && mise install bun"
+          errors=$((errors + 1))
+        fi
+
+        # Summary
+        if [ $errors -gt 0 ]; then
+          echo "ERROR: $errors runtime conflict(s) found"
+          exit 1
+        fi
+        if [ $warnings -gt 0 ]; then
+          echo "WARNING: $warnings runtime(s) need installation"
+        fi
+        echo "✓ All runtimes verified"
 
   hooks:install:
     desc: "Install pre-commit hooks"
@@ -725,3 +829,61 @@ tasks:
     desc: "Run pre-commit on all files"
     cmds:
       - pre-commit run --all-files
+
+  validate:test:
+    desc: "Run validation test suite"
+    cmds:
+      - chmod +x scripts/test-validation.sh
+      - ./scripts/test-validation.sh
+
+  validate:shell:
+    desc: "Test shell configuration (zsh, oh-my-zsh, mise)"
+    cmds:
+      - chmod +x scripts/test-shell-config.sh
+      - ./scripts/test-shell-config.sh
+
+  validate:integration:
+    desc: "Run integration tests"
+    cmds:
+      - chmod +x scripts/test-integration.sh
+      - ./scripts/test-integration.sh
+
+  config:verify:
+    desc: "Verify all configurations applied correctly"
+    cmds:
+      - |
+        echo "=== Configuration Verification ==="
+        errors=0
+        echo "--- Git Config ---"
+        git config --global init.defaultBranch 2>/dev/null | grep -q main && echo "✓ defaultBranch=main" || { echo "✗ defaultBranch"; errors=$((errors+1)); }
+        git config --global core.pager 2>/dev/null | grep -q delta && echo "✓ pager=delta" || echo "⚠ pager not delta (optional)"
+        echo "--- Shell Config ---"
+        grep -q "plugins=(" ~/.zshrc && echo "✓ oh-my-zsh plugins configured" || { echo "✗ plugins not configured"; errors=$((errors+1)); }
+        grep -q "mise" ~/.zshrc && echo "✓ mise in .zshrc" || { echo "✗ mise not in .zshrc"; errors=$((errors+1)); }
+        echo "--- Ghostty Config ---"
+        test -f ~/.config/ghostty/config && echo "✓ ghostty config exists" || echo "⚠ ghostty config missing (optional)"
+        echo "--- Tmux Config ---"
+        test -f ~/.tmux.conf && echo "✓ tmux config exists" || echo "⚠ tmux config missing (optional)"
+        echo ""
+        if [ $errors -eq 0 ]; then echo "✓ All required configurations verified"; else echo "✗ $errors configuration(s) missing"; exit 1; fi
+
+  db:verify:
+    desc: "Verify database containers and client connectivity"
+    cmds:
+      - task: db:status
+      - |
+        echo "=== Database Client Verification ==="
+        if psql -h localhost -U dev -d dev -c "SELECT 1;" &>/dev/null; then echo "✓ PostgreSQL client works"; else echo "✗ PostgreSQL client failed"; exit 1; fi
+        if redis-cli -h localhost -p 6379 -a dev PING 2>/dev/null | grep -q PONG; then echo "✓ Redis client works"; else echo "✗ Redis client failed"; exit 1; fi
+        echo "✓ All database clients verified"
+
+  validate:full:
+    desc: "Run ALL validation checks (comprehensive)"
+    cmds:
+      - echo "=== Full Validation Suite ==="
+      - task: validate
+      - task: validate:shell
+      - task: validate:integration
+      - task: config:verify
+      - echo ""
+      - echo "✓ Full validation complete - all checks passed"

@@ -6,14 +6,27 @@
 default:
     @just --list
 
-# Validate all configuration files
+# Validate all configuration files (fast)
 validate:
+    task validate
+
+# Comprehensive validation (includes slow checks)
+validate-all:
     @chmod +x scripts/validate.sh
     @./scripts/validate.sh
 
 # Quick validation (just schema check)
 validate-quick:
     @python3 -m check_jsonschema --builtin-schema vendor.taskfile Taskfile.yml
+
+# Run validation test suite
+validate-test:
+    @chmod +x scripts/test-validation.sh
+    @./scripts/test-validation.sh
+
+# Verify runtime installations
+validate-runtimes:
+    task validate:runtimes
 
 # Install Stage 1 (core tools)
 stage1:

@@ -108,6 +108,7 @@ if ! command -v brew &>/dev/null; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
 
     # Add to .zprofile for future sessions
+    # shellcheck disable=SC2016  # Intentionally writing literal string to file
     echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
     log_success "Homebrew installed"
 else
