@@ -1,0 +1,77 @@
+# Tempo Configuration
+# Distributed tracing for AI agent workflows
+# Documentation: https://grafana.com/docs/tempo/latest/configuration/
+
+server:
+  http_listen_port: 3200
+  grpc_listen_port: 9095
+  log_level: info
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+
+ingester:
+  max_block_duration: 5m
+
+compactor:
+  compaction:
+    block_retention: 168h  # 7 days
+
+metrics_generator:
+  registry:
+    external_labels:
+      source: tempo
+      cluster: guilde-lite
+  storage:
+    path: /var/tempo/generator/wal
+    remote_write:
+      - url: http://mimir:9009/api/v1/push
+        send_exemplars: true
+  traces_storage:
+    path: /var/tempo/generator/traces
+  processor:
+    service_graphs:
+      dimensions:
+        - agent.type
+        - tool.name
+        - skill.name
+    span_metrics:
+      dimensions:
+        - agent.type
+        - tool.name
+        - skill.name
+        - session.id
+
+storage:
+  trace:
+    backend: local
+    wal:
+      path: /var/tempo/wal
+    local:
+      path: /var/tempo/blocks
+
+querier:
+  frontend_worker:
+    frontend_address: localhost:9095
+
+overrides:
+  defaults:
+    metrics_generator:
+      processors:
+        - service-graphs
+        - span-metrics
+
+# Span attributes for AI agent tracing
+# Expected attributes:
+# - session.id: Claude Code session identifier
+# - agent.type: Agent/subagent type (haiku, sonnet, opus)
+# - tool.name: Tool being used (Read, Write, Bash, etc.)
+# - skill.name: Skill/command being executed
+# - context.tokens: Token count for context
+# - context.compaction_count: Number of compactions

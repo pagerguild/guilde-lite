@@ -1090,3 +1090,99 @@ tasks:
     desc: "Create release entry (usage: task changelog:release -- 1.0.0)"
     cmds:
       - bash scripts/changelog-generator.sh release {{.CLI_ARGS}}
+
+  # ===========================================================================
+  # TELEMETRY & OBSERVABILITY TASKS
+  # ===========================================================================
+  otel:up:
+    desc: "Start observability stack (Grafana LGTM)"
+    cmds:
+      - docker compose -f docker/observability-compose.yml up -d
+      - echo "Starting observability stack..."
+      - task: otel:wait
+
+  otel:up:quick:
+    desc: "Start quick observability stack (all-in-one container)"
+    cmds:
+      - docker compose -f docker/observability-compose.yml --profile quick up -d otel-lgtm
+      - echo "Quick LGTM stack starting at http://localhost:3000"
+
+  otel:down:
+    desc: "Stop observability stack"
+    cmds:
+      - docker compose -f docker/observability-compose.yml down
+
+  otel:wait:
+    desc: "Wait for observability stack to be ready"
+    cmds:
+      - |
+        echo "Waiting for Grafana..."
+        timeout=60
+        while ! curl -s http://localhost:3000/api/health >/dev/null 2>&1; do
+          sleep 2
+          timeout=$((timeout - 2))
+          if [ $timeout -le 0 ]; then
+            echo "Grafana timeout"
+            exit 1
+          fi
+        done
+        echo "Grafana ready at http://localhost:3000"
+      - echo "Observability stack ready!"
+
+  otel:status:
+    desc: "Show observability stack status"
+    cmds:
+      - docker compose -f docker/observability-compose.yml ps
+      - echo ""
+      - |
+        echo "=== Service URLs ==="
+        echo "Grafana:      http://localhost:3000 (admin/admin)"
+        echo "Alloy:        http://localhost:12345"
+        echo "OTLP gRPC:    localhost:4317"
+        echo "OTLP HTTP:    localhost:4318"
+        echo "Loki:         http://localhost:3100"
+        echo "Tempo:        http://localhost:3200"
+        echo "Mimir:        http://localhost:9009"
+
+  telemetry:status:
+    desc: "Show telemetry hook status"
+    cmds:
+      - bash scripts/telemetry-hook.sh status
+
+  telemetry:report:
+    desc: "Generate telemetry report"
+    cmds:
+      - bash scripts/telemetry-hook.sh report
+
+  telemetry:session:start:
+    desc: "Start telemetry session"
+    cmds:
+      - bash scripts/telemetry-hook.sh session-start
+
+  telemetry:session:end:
+    desc: "End telemetry session"
+    cmds:
+      - bash scripts/telemetry-hook.sh session-end
+
+  telemetry:emit:
+    desc: "Emit current session metrics"
+    cmds:
+      - bash scripts/telemetry-hook.sh emit-metrics
+
+  telemetry:env:
+    desc: "Show telemetry environment configuration"
+    cmds:
+      - cat .env.telemetry
+      - echo ""
+      - echo "Source with: source .env.telemetry"
+
+  otel:logs:
+    desc: "View Alloy collector logs"
+    cmds:
+      - docker logs -f otel-alloy
+
+  otel:reset:
+    desc: "Reset observability stack (delete all data)"
+    cmds:
+      - docker compose -f docker/observability-compose.yml down -v
+      - task: otel:up

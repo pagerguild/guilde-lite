@@ -1,0 +1,184 @@
+# Docker Compose - Observability Stack
+# Grafana LGTM (Loki, Grafana, Tempo, Mimir) with Alloy Collector
+# Optimized for AI agent telemetry with OpenTelemetry
+#
+# Usage: docker compose -f docker/observability-compose.yml up -d
+# Quick start: docker compose -f docker/observability-compose.yml --profile quick up -d
+
+services:
+  # ===========================================================================
+  # Grafana Alloy - OpenTelemetry Collector (next-gen)
+  # Replaces legacy Grafana Agent, 100% OTLP compatible
+  # ===========================================================================
+  alloy:
+    image: grafana/alloy:latest
+    container_name: otel-alloy
+    restart: unless-stopped
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - /etc/alloy/config.alloy
+    ports:
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+      - "12345:12345" # Alloy UI
+    volumes:
+      - ./observability/alloy-config.alloy:/etc/alloy/config.alloy:ro
+    depends_on:
+      - loki
+      - tempo
+      - mimir
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:12345/-/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # ===========================================================================
+  # Grafana Loki - Log Aggregation
+  # ===========================================================================
+  loki:
+    image: grafana/loki:latest
+    container_name: otel-loki
+    restart: unless-stopped
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki_data:/loki
+      - ./observability/loki-config.yaml:/etc/loki/local-config.yaml:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3100/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # ===========================================================================
+  # Grafana Tempo - Distributed Tracing
+  # ===========================================================================
+  tempo:
+    image: grafana/tempo:latest
+    container_name: otel-tempo
+    restart: unless-stopped
+    command: -config.file=/etc/tempo/tempo.yaml
+    ports:
+      - "3200:3200"   # Tempo API
+      - "9095:9095"   # Tempo gRPC
+    volumes:
+      - tempo_data:/var/tempo
+      - ./observability/tempo-config.yaml:/etc/tempo/tempo.yaml:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3200/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # ===========================================================================
+  # Grafana Mimir - Metrics Storage (Prometheus-compatible)
+  # ===========================================================================
+  mimir:
+    image: grafana/mimir:latest
+    container_name: otel-mimir
+    restart: unless-stopped
+    command:
+      - -config.file=/etc/mimir/mimir.yaml
+      - -target=all
+    ports:
+      - "9009:9009"   # Mimir API
+    volumes:
+      - mimir_data:/data
+      - ./observability/mimir-config.yaml:/etc/mimir/mimir.yaml:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9009/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  # ===========================================================================
+  # Grafana - Visualization Dashboard
+  # ===========================================================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: otel-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_FEATURE_TOGGLES_ENABLE: traceqlEditor tempoSearch tempoBackendSearch
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - loki
+      - tempo
+      - mimir
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # ===========================================================================
+  # Quick Start: All-in-one LGTM (for development/testing)
+  # Use --profile quick for simplified setup
+  # ===========================================================================
+  otel-lgtm:
+    image: grafana/otel-lgtm:latest
+    container_name: otel-lgtm-quick
+    profiles: ["quick"]
+    restart: unless-stopped
+    ports:
+      - "3000:3000"   # Grafana UI
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "9090:9090"   # Prometheus metrics
+    volumes:
+      - lgtm_data:/data
+    environment:
+      OTEL_METRIC_EXPORT_INTERVAL: "5000"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+
+volumes:
+  loki_data:
+  tempo_data:
+  mimir_data:
+  grafana_data:
+  lgtm_data:
+
+networks:
+  default:
+    name: dev-network
+    external: true

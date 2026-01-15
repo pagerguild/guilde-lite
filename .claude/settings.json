@@ -43,6 +43,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash scripts/telemetry-hook.sh session-start 2>/dev/null || echo 'Telemetry session start skipped'"
+          },
+          {
+            "type": "command",
             "command": "bash scripts/claude-health-check.sh 2>/dev/null || echo 'Health check skipped'"
           },
           {
@@ -71,6 +75,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash scripts/telemetry-hook.sh pre-compact 2>/dev/null || true"
+          },
+          {
+            "type": "command",
             "command": "bash scripts/preserve-context.sh --save 2>/dev/null || echo 'Context preservation skipped'"
           },
           {
@@ -81,6 +89,14 @@
       }
     ],
     "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'bash scripts/telemetry-hook.sh post-tool \"{\\\"tool_name\\\":\\\"$CLAUDE_TOOL_NAME\\\",\\\"status\\\":\\\"success\\\"}\" 2>/dev/null' || true"
+          }
+        ]
+      },
       {
         "matcher": "Bash",
         "hooks": [
@@ -122,6 +138,16 @@
           {
             "type": "command",
             "command": "bash -c 'AGENT=\"$CLAUDE_TOOL_INPUT\"; if echo \"$AGENT\" | grep -qiE \"code-reviewer|review\"; then bash scripts/multi-agent-metrics.sh track code_change_reviewed 2>/dev/null; fi' || true"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/telemetry-hook.sh session-end 2>/dev/null || true"
           }
         ]
       }

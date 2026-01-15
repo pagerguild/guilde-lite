@@ -1,0 +1,64 @@
+# Mimir Configuration
+# Metrics storage for AI agent telemetry
+# Documentation: https://grafana.com/docs/mimir/latest/configure/
+
+multitenancy_enabled: false
+
+server:
+  http_listen_port: 9009
+  grpc_listen_port: 9095
+  log_level: info
+
+distributor:
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore:
+      store: memberlist
+
+ingester:
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore:
+      store: memberlist
+    replication_factor: 1
+
+blocks_storage:
+  backend: filesystem
+  bucket_store:
+    sync_dir: /data/tsdb-sync
+  filesystem:
+    dir: /data/blocks
+  tsdb:
+    dir: /data/tsdb
+
+compactor:
+  data_dir: /data/compactor
+  sharding_ring:
+    kvstore:
+      store: memberlist
+
+store_gateway:
+  sharding_ring:
+    replication_factor: 1
+
+limits:
+  # Cardinality limits for high-dimensional agent metrics
+  max_global_series_per_user: 500000
+  max_global_series_per_metric: 50000
+  max_label_names_per_series: 30
+  max_label_value_length: 2048
+
+  # Retention
+  compactor_blocks_retention_period: 168h  # 7 days
+
+ruler_storage:
+  backend: filesystem
+  filesystem:
+    dir: /data/rules
+
+# Expected metrics for AI agent telemetry:
+# - claude_agent_tokens_total{agent_type, session_id}
+# - claude_agent_tool_calls_total{tool_name, status}
+# - claude_agent_context_compaction_total{session_id}
+# - claude_agent_skill_invocations_total{skill_name}
+# - claude_agent_latency_seconds{operation}

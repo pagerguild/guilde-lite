@@ -1,0 +1,59 @@
+# Grafana Datasources - Auto-provisioned
+# Connects to Loki, Tempo, and Mimir backends
+
+apiVersion: 1
+
+datasources:
+  # Mimir - Metrics (Prometheus-compatible)
+  - name: Mimir
+    type: prometheus
+    access: proxy
+    url: http://mimir:9009/prometheus
+    isDefault: true
+    jsonData:
+      httpMethod: POST
+      manageAlerts: true
+      prometheusType: Mimir
+
+  # Loki - Logs
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    jsonData:
+      derivedFields:
+        - name: TraceID
+          datasourceUid: tempo
+          matcherRegex: "trace_id=(\\w+)"
+          url: "$${__value.raw}"
+          urlDisplayLabel: View Trace
+
+  # Tempo - Traces
+  - name: Tempo
+    type: tempo
+    uid: tempo
+    access: proxy
+    url: http://tempo:3200
+    jsonData:
+      httpMethod: GET
+      tracesToLogs:
+        datasourceUid: loki
+        tags: ["session.id", "agent.type"]
+        mappedTags: [{ key: "service.name", value: "service_name" }]
+        mapTagNamesEnabled: true
+        spanStartTimeShift: "-1h"
+        spanEndTimeShift: "1h"
+        filterByTraceID: true
+        filterBySpanID: false
+      tracesToMetrics:
+        datasourceUid: mimir
+        tags: [{ key: "agent.type", value: "agent_type" }]
+        queries:
+          - name: "Token Usage"
+            query: "sum(claude_agent_tokens_total{$$__tags}) by (agent_type)"
+      serviceMap:
+        datasourceUid: mimir
+      nodeGraph:
+        enabled: true
+      lokiSearch:
+        datasourceUid: loki

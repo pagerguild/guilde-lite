@@ -1,0 +1,113 @@
+// Grafana Alloy Configuration
+// OpenTelemetry collector optimized for AI agent telemetry
+// Documentation: https://grafana.com/docs/alloy/latest/
+
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+// ===========================================================================
+// OTLP Receivers - Accept telemetry from Claude Code and other agents
+// ===========================================================================
+
+otelcol.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+
+  output {
+    metrics = [otelcol.processor.batch.default.input]
+    logs    = [otelcol.processor.batch.default.input]
+    traces  = [otelcol.processor.batch.default.input]
+  }
+}
+
+// ===========================================================================
+// Processors - Batch telemetry for efficient export
+// ===========================================================================
+
+otelcol.processor.batch "default" {
+  timeout             = "5s"
+  send_batch_size     = 1000
+  send_batch_max_size = 2000
+
+  output {
+    metrics = [otelcol.processor.attributes.agent_metadata.input]
+    logs    = [otelcol.processor.attributes.agent_metadata.input]
+    traces  = [otelcol.processor.attributes.agent_metadata.input]
+  }
+}
+
+// Add common attributes for AI agent identification
+otelcol.processor.attributes "agent_metadata" {
+  action {
+    key    = "deployment.environment"
+    value  = "development"
+    action = "upsert"
+  }
+  action {
+    key    = "service.namespace"
+    value  = "guilde-lite"
+    action = "upsert"
+  }
+
+  output {
+    metrics = [otelcol.exporter.otlphttp.mimir.input]
+    logs    = [otelcol.exporter.loki.default.input]
+    traces  = [otelcol.exporter.otlp.tempo.input]
+  }
+}
+
+// ===========================================================================
+// Exporters - Send to Grafana LGTM backends
+// ===========================================================================
+
+// Export metrics to Mimir
+otelcol.exporter.otlphttp "mimir" {
+  client {
+    endpoint = "http://mimir:9009/otlp"
+  }
+}
+
+// Export logs to Loki
+otelcol.exporter.loki "default" {
+  forward_to = [loki.write.default.receiver]
+}
+
+loki.write "default" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+
+// Export traces to Tempo
+otelcol.exporter.otlp "tempo" {
+  client {
+    endpoint = "tempo:4317"
+    tls {
+      insecure = true
+    }
+  }
+}
+
+// ===========================================================================
+// Custom metrics for AI agent monitoring
+// ===========================================================================
+
+// Prometheus scrape for local metrics
+prometheus.scrape "alloy_metrics" {
+  targets = [{
+    __address__ = "localhost:12345",
+  }]
+  forward_to = [prometheus.remote_write.mimir.receiver]
+}
+
+prometheus.remote_write "mimir" {
+  endpoint {
+    url = "http://mimir:9009/api/v1/push"
+  }
+}
