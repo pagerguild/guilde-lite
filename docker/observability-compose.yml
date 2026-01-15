@@ -2,8 +2,9 @@
 # Grafana LGTM (Loki, Grafana, Tempo, Mimir) with Alloy Collector
 # Optimized for AI agent telemetry with OpenTelemetry
 #
-# Usage: docker compose -f docker/observability-compose.yml up -d
-# Quick start: docker compose -f docker/observability-compose.yml --profile quick up -d
+# Usage:
+#   Full stack:  docker compose -f docker/observability-compose.yml --profile full up -d
+#   Quick start: docker compose -f docker/observability-compose.yml --profile quick up -d
 #
 # Environment Variables:
 #   GRAFANA_ADMIN_USER     - Grafana admin username (default: admin)
@@ -18,6 +19,7 @@ services:
   alloy:
     image: grafana/alloy:v1.3.1
     container_name: otel-alloy
+    profiles: ["full"]
     restart: unless-stopped
     command:
       - run
@@ -49,6 +51,7 @@ services:
   loki:
     image: grafana/loki:3.2.1
     container_name: otel-loki
+    profiles: ["full"]
     restart: unless-stopped
     command: -config.file=/etc/loki/local-config.yaml
     ports:
@@ -72,6 +75,7 @@ services:
   tempo:
     image: grafana/tempo:2.6.1
     container_name: otel-tempo
+    profiles: ["full"]
     restart: unless-stopped
     command: -config.file=/etc/tempo/tempo.yaml
     ports:
@@ -96,6 +100,7 @@ services:
   mimir:
     image: grafana/mimir:2.14.1
     container_name: otel-mimir
+    profiles: ["full"]
     restart: unless-stopped
     command:
       - -config.file=/etc/mimir/mimir.yaml
@@ -121,6 +126,7 @@ services:
   grafana:
     image: grafana/grafana:11.3.0
     container_name: otel-grafana
+    profiles: ["full"]
     restart: unless-stopped
     ports:
       - "3000:3000"
