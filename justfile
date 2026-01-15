@@ -66,10 +66,9 @@ db-up:
 db-down:
     docker compose -f docker/docker-compose.yml down
 
-# Install pre-commit hooks
+# Install pre-commit hooks (uv preferred over pip)
 hooks-install:
-    pip install pre-commit
-    pre-commit install
+    mise exec -- uvx pre-commit install
 
 # Run pre-commit on all files
 hooks-run:

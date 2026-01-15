@@ -58,7 +58,11 @@ brew "zellij"               # Modern tmux alternative (optional)
 # 5. AI CODING TOOLS
 # =============================================================================
 cask "cursor"               # AI-native editor
-# Claude Code, OpenCode, Codex installed via mise (npm packages)
+# AI CLI tools installed via mise (see mise.toml):
+#   - Claude Code: curl installer (npm deprecated)
+#   - OpenCode: mise native plugin
+#   - Codex: mise npm:@openai/codex
+#   - Gemini CLI: mise npm:@google/gemini-cli
 
 # =============================================================================
 # 6. AWS & CLOUD TOOLS

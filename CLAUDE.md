@@ -110,6 +110,17 @@ Directories:
 - **OrbStack** over Docker Desktop - Lighter, faster on Apple Silicon
 - **Task** over Make - Go-based task runner
 
+### Installation Priority Order
+When installing tools, follow this priority (highest to lowest):
+1. **curl/wget** - Direct installers (e.g., Claude Code)
+2. **mise** - Universal runtime manager (preferred for most tools)
+3. **uv/uvx** - Python tools (ALWAYS prefer over pip)
+4. **bun** - JS/TS tools (prefer over npm)
+5. **npm** - JS tools when bun unavailable
+6. **homebrew** - System tools only when above unavailable
+
+**Python Package Rule:** NEVER use `pip install`. ALWAYS use `uv pip install` or `uvx` for running Python tools.
+
 ---
 
 ## Detailed Documentation

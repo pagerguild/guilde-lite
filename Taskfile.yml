@@ -852,8 +852,7 @@ tasks:
   hooks:install:
     desc: "Install pre-commit hooks"
     cmds:
-      - pip install pre-commit
-      - pre-commit install
+      - mise exec -- uvx pre-commit install
       - echo "✓ Pre-commit hooks installed"
 
   hooks:run:

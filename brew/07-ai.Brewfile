@@ -5,5 +5,9 @@
 # AI Editor
 cask "cursor"               # AI-native editor
 
-# Note: Claude Code installed via mise (npm package)
-# Note: Other AI tools (OpenCode, Codex) installed via mise
+# AI CLI tools installed via mise (see mise.toml):
+#   Priority: curl > mise > bun > npm > homebrew
+#   - Claude Code: curl -fsSL https://claude.ai/install.sh | bash
+#   - OpenCode: mise install opencode
+#   - Codex: mise install npm:@openai/codex
+#   - Gemini CLI: mise install npm:@google/gemini-cli

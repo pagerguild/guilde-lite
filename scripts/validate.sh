@@ -36,7 +36,7 @@ if command -v python3 &>/dev/null; then
             log_error "Taskfile.yml schema validation failed"
         fi
     else
-        log_warn "check-jsonschema not installed (pip install check-jsonschema)"
+        log_warn "check-jsonschema not installed (mise exec -- uvx check-jsonschema)"
     fi
 else
     log_warn "Python3 not found, skipping schema validation"
