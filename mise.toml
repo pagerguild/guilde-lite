@@ -6,20 +6,20 @@
 
 [tools]
 # =============================================================================
-# CORE LANGUAGES
+# CORE LANGUAGES (all set to latest for cutting-edge development)
 # =============================================================================
 
 # Go - Primary for orchestration, CLI tools, agents
-go = "1.23"
+go = "latest"
 
 # Rust - Systems programming, performance-critical code
 rust = "latest"
 
 # Python - AI/ML, scripting, data processing
-python = "3.12"
+python = "latest"
 
-# Node.js - Legacy tooling compatibility
-node = "lts"
+# Node.js - For npm packages and JS tooling
+node = "latest"
 
 # =============================================================================
 # MODERN RUNTIMES (Drop-in replacements)
@@ -53,16 +53,18 @@ opencode = "latest"
 "npm:@google/gemini-cli" = "latest"
 
 # =============================================================================
-# PYTHON TOOLS (via pipx/uv)
+# PYTHON/CLI TOOLS
 # =============================================================================
+# Priority: Pre-built binaries (aqua/ubi) > pipx (uses uvx when uv installed)
+# Note: pipx: backend automatically uses uvx for speed when uv is available
 
-# Type checker (mypy for static type checking)
+# Ruff - Linter + formatter (pre-built binary via registry)
+ruff = "latest"
+
+# Type checker (mypy - pure Python, uses uvx via pipx backend)
 "pipx:mypy" = "latest"
 
-# Ruff - Linter + formatter (replaces flake8, black, isort)
-"pipx:ruff" = "latest"
-
-# SkyPilot - Cloud compute orchestration
+# SkyPilot - Cloud compute orchestration (pure Python, uses uvx)
 "pipx:skypilot[aws]" = "latest"
 
 # =============================================================================
@@ -136,13 +138,15 @@ auto_install = true
 jobs = 4
 
 # =============================================================================
-# TOOL VERSION ALIASES (new format, replaces deprecated [alias])
+# TOOL VERSION ALIASES (for pinning to specific versions when needed)
 # =============================================================================
 
 [tool_alias.python.versions]
+py314 = "3.14"
+py313 = "3.13"
 py312 = "3.12"
-py311 = "3.11"
 
 [tool_alias.node.versions]
-lts-iron = "20"
-lts-hydrogen = "18"
+lts = "24"
+node22 = "22"
+node20 = "20"
