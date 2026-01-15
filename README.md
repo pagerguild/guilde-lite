@@ -91,6 +91,36 @@ task help:stages
 - **Qdrant** - Purpose-built vector DB
 - **ChromaDB** - Embedding database
 
+## Multi-Agent Workflow System
+
+Guilde Lite includes a comprehensive multi-agent orchestration system for AI-assisted development.
+
+### Quick Start
+
+```bash
+/conductor-status          # View current track and progress
+/conductor-new-track       # Start a new implementation track
+/conductor-implement       # Work on current phase with TDD
+/conductor-checkpoint      # Mark phase complete
+```
+
+### Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **12 Specialized Agents** | Research (haiku), Development (sonnet), Review (opus) |
+| **10 Skills** | Context loading, TDD phases, code review pipeline |
+| **7 Hookify Rules** | Safety, TDD enforcement, doc sync reminders |
+| **Telemetry** | OpenTelemetry metrics with Grafana dashboards |
+
+### Agent Tiers
+
+- **Research** (haiku): context-explorer, docs-researcher, codebase-analyzer
+- **Development** (sonnet): spec-builder, frontend-developer, test-automator, database-optimizer
+- **Review** (opus): code-reviewer, security-auditor, architect-reviewer
+
+See [docs/MULTI-AGENT-WORKFLOW.md](docs/MULTI-AGENT-WORKFLOW.md) for full documentation.
+
 ## Commands
 
 ```bash
