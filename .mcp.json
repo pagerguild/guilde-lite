@@ -1,18 +1,12 @@
 {
   "mcpServers": {
-    "agentic-jujutsu": {
-      "command": "npx",
-      "args": ["agentic-jujutsu", "mcp-server"],
-      "env": {
-        "JJ_REPO_PATH": "${workspaceFolder}"
-      }
-    },
     "jj-mcp-server": {
       "command": "npx",
-      "args": ["jj-mcp-server"],
-      "env": {
-        "JJ_PATH": "${workspaceFolder}"
-      }
+      "args": ["jj-mcp-server"]
+    },
+    "agentic-jujutsu": {
+      "command": "node",
+      "args": ["node_modules/agentic-jujutsu/bin/mcp-server.js"]
     }
   }
 }
