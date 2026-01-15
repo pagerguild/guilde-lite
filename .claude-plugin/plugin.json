@@ -18,7 +18,8 @@
       "context-loader",
       "code-review-pipeline",
       "test-gen-workflow",
-      "error-recovery"
+      "error-recovery",
+      "release-researcher"
     ],
     "agents": [
       "context-explorer",
@@ -45,7 +46,8 @@
       "conductor-implement",
       "conductor-status",
       "conductor-checkpoint",
-      "conductor-sync-docs"
+      "conductor-sync-docs",
+      "research-releases"
     ],
     "hooks": [
       "hookify.block-destructive",
