@@ -1034,3 +1034,59 @@ tasks:
     desc: "Show test coverage report"
     cmds:
       - bash scripts/tdd-enforcer.sh coverage
+
+  # ===========================================================================
+  # DOCUMENTATION TASKS
+  # ===========================================================================
+  docs:status:
+    desc: "Show documentation sync status"
+    cmds:
+      - bash scripts/doc-sync-check.sh status
+
+  docs:scan:
+    desc: "Scan modified files for documentation impact"
+    cmds:
+      - bash scripts/doc-sync-check.sh scan
+
+  docs:validate:
+    desc: "Validate documentation structure"
+    cmds:
+      - bash scripts/doc-sync-check.sh validate
+
+  docs:check:
+    desc: "Check if a file needs documentation updates"
+    cmds:
+      - bash scripts/doc-sync-check.sh check {{.CLI_ARGS}}
+
+  docs:report:
+    desc: "Generate documentation report"
+    cmds:
+      - bash scripts/doc-sync-check.sh report
+
+  docs:mappings:
+    desc: "Show code-to-documentation mappings"
+    cmds:
+      - bash scripts/doc-sync-check.sh mappings
+
+  # ===========================================================================
+  # CHANGELOG TASKS
+  # ===========================================================================
+  changelog:status:
+    desc: "Show changelog status"
+    cmds:
+      - bash scripts/changelog-generator.sh status
+
+  changelog:preview:
+    desc: "Preview unreleased changes"
+    cmds:
+      - bash scripts/changelog-generator.sh preview
+
+  changelog:add:
+    desc: "Add changelog entry (usage: task changelog:add -- feat 'Added feature')"
+    cmds:
+      - bash scripts/changelog-generator.sh add {{.CLI_ARGS}}
+
+  changelog:release:
+    desc: "Create release entry (usage: task changelog:release -- 1.0.0)"
+    cmds:
+      - bash scripts/changelog-generator.sh release {{.CLI_ARGS}}

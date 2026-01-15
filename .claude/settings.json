@@ -99,7 +99,7 @@
           },
           {
             "type": "prompt",
-            "prompt": "CODE CHANGE + TDD RECORDED:\n1. Pending code review required before commit\n2. TDD: If you wrote a TEST file in RED phase, consider running it to verify it FAILS, then move to GREEN phase (bash scripts/tdd-enforcer.sh phase green)\n3. If you wrote IMPLEMENTATION in GREEN phase, run tests to verify they PASS, then move to REFACTOR phase"
+            "prompt": "CODE CHANGE + TDD RECORDED:\n1. Pending code review required before commit\n2. TDD: If you wrote a TEST file in RED phase, consider running it to verify it FAILS, then move to GREEN phase (bash scripts/tdd-enforcer.sh phase green)\n3. If you wrote IMPLEMENTATION in GREEN phase, run tests to verify they PASS, then move to REFACTOR phase\n4. DOC-SYNC: If this changes public APIs, configs, or workflows, check if documentation needs updating (bash scripts/doc-sync-check.sh check <file>)"
           }
         ]
       },
@@ -112,7 +112,7 @@
           },
           {
             "type": "prompt",
-            "prompt": "CODE CHANGE + TDD RECORDED:\n1. Pending code review required before commit\n2. TDD: After edits, run relevant tests to ensure they still pass\n3. In REFACTOR phase, ensure no behavior changes (tests should pass)"
+            "prompt": "CODE CHANGE + TDD RECORDED:\n1. Pending code review required before commit\n2. TDD: After edits, run relevant tests to ensure they still pass\n3. In REFACTOR phase, ensure no behavior changes (tests should pass)\n4. DOC-SYNC: If this changes public APIs, configs, or workflows, check if documentation needs updating"
           }
         ]
       },
