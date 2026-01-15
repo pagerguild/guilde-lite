@@ -9,6 +9,16 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "MULTI-AGENT WORKFLOW ENFORCEMENT: Before responding, consider if this task requires parallel subagents. For research tasks, use Explore agents. For code changes, plan to invoke code-reviewer and test-automator agents. For validation, launch multiple validators in parallel. Skip multi-agent only for trivial tasks (single file reads, direct questions with known answers). See .claude/rules/multi-agent-workflow.md for requirements."
+          }
+        ]
+      }
     ]
   },
   "enabledPlugins": {

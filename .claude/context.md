@@ -38,6 +38,10 @@ overall_progress: 10/101
 | Update CLAUDE.md with memory best practices | - | 2026-01-14 |
 | Create conductor/tech-stack.md | - | 2026-01-14 |
 | Create conductor/product.md | - | 2026-01-14 |
+| **Add multi-agent workflow hooks** | pending | 2026-01-14 |
+| **Create multi-agent enforcement rule** | pending | 2026-01-14 |
+| **Add UserPromptSubmit hook** | pending | 2026-01-14 |
+| **Create Claude Code configuration docs** | pending | 2026-01-14 |
 
 ## Pending This Phase
 
@@ -61,11 +65,14 @@ conductor/tracks/MULTI-001/spec.md     # Requirements spec
 conductor/tracks/MULTI-001/plan.md     # Implementation plan
 conductor/tracks/MULTI-001/metadata.json # Track metadata
 CLAUDE.md                              # Project memory (updated)
-.claude/settings.json                  # Hooks configuration
+.claude/settings.json                  # Hooks configuration (SessionStart + UserPromptSubmit)
 .claude/rules/quality-gates.md        # Quality enforcement rules
 .claude/rules/coding-standards.md     # Language conventions
 .claude/rules/tdd-requirements.md     # TDD workflow rules
 .claude/rules/documentation-standards.md # Doc standards
+.claude/rules/multi-agent-workflow.md # **NEW** Multi-agent enforcement rule
+docs/CLAUDE-CODE-CONFIGURATION.md     # **NEW** Full config documentation
+scripts/session-startup.sh            # **UPDATED** Added multi-agent reminders
 ```
 
 ## Important Context
@@ -76,6 +83,8 @@ CLAUDE.md                              # Project memory (updated)
 - Multi-agent consensus for architecture decisions
 - Documentation must stay in sync with code
 - **jj (Jujutsu)** recommended for lock-free multi-agent VCS operations
+- **Multi-agent workflow ENFORCED** via UserPromptSubmit hook
+- For every substantive task, use parallel subagents (see `.claude/rules/multi-agent-workflow.md`)
 
 ## Commands to Continue
 

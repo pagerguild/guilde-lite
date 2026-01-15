@@ -51,5 +51,16 @@ if [[ -f SESSION_HANDOFF.md ]]; then
 fi
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "MULTI-AGENT WORKFLOW REQUIRED"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "For EVERY substantive task, use parallel subagents:"
+echo "  - Research: Task tool with Explore agent (2-3 paths)"
+echo "  - Code changes: code-reviewer + test-automator agents"
+echo "  - Validation: Launch multiple validators in parallel"
+echo "  - Documentation: docs-architect + tutorial-engineer agents"
+echo ""
+echo "See: .claude/rules/multi-agent-workflow.md for full requirements"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "Read CLAUDE.md for full context. Run: cat conductor/tracks/MULTI-001/plan.md"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
