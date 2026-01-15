@@ -55,12 +55,13 @@ Study and adopt skill authoring patterns from superpowers plugin.
 
 **Deliverables:**
 - 12 plugins with proper structure
-- 12 commands migrated
-- 13 agents migrated
+- 12 commands migrated (including multi-agent.md fix)
+- 12 agents migrated
 - 11 skills migrated
 - marketplace.json validated
 - GitHub repo: pagerguild/guilde-plugins
 - Local marketplace: ./marketplace/
+- Full component parity with local guilde-lite
 
 **Spec:** [conductor/tracks/MARKETPLACE-001/spec.md](tracks/MARKETPLACE-001/spec.md)
 **Plan:** [conductor/tracks/MARKETPLACE-001/plan.md](tracks/MARKETPLACE-001/plan.md)
