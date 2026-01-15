@@ -189,7 +189,7 @@
 
 ---
 
-## Phase 6: Telemetry Setup [checkpoint: pending]
+## Phase 6: Telemetry Setup [checkpoint: 19d98ff]
 
 ### Objectives
 - Configure OpenTelemetry collection
@@ -210,7 +210,7 @@
 - [x] Telemetry collecting data
 - [x] Metrics visible in dashboard (via Grafana LGTM)
 - [x] No performance impact (< 50ms overhead)
-- [ ] Git committed with checkpoint
+- [x] Git committed with checkpoint (19d98ff)
 
 ---
 
