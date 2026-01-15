@@ -17,18 +17,27 @@
 - Commit: `conductor(plan): Mark task '{task}' as in progress`
 
 ### 3. TDD: Write Failing Tests (RED)
+```bash
+task tdd:red    # Set phase to RED
+```
 - Create test file BEFORE implementation
 - Write tests that define expected behavior
 - Run tests and **VERIFY THEY FAIL**
 - Commit: `test: Add failing tests for {feature}`
 
 ### 4. TDD: Implement to Pass (GREEN)
+```bash
+task tdd:green  # Set phase to GREEN
+```
 - Write MINIMAL code to pass tests
 - No extra features or optimizations
 - Run tests and **VERIFY THEY PASS**
 - Commit: `feat: Implement {feature}`
 
-### 5. TDD: Refactor (BLUE)
+### 5. TDD: Refactor (REFACTOR)
+```bash
+task tdd:refactor  # Set phase to REFACTOR
+```
 - Improve code quality without changing behavior
 - Extract duplication, rename for clarity
 - Run tests and **VERIFY STILL PASSING**
@@ -256,8 +265,70 @@ Use Task tool with subagent_type="test-automator"
 
 ---
 
+## TDD Workflow Details
+
+### Phase Tracking
+
+The TDD enforcer tracks your current phase:
+
+```bash
+# Check current phase
+task tdd:status
+
+# Move to next phase
+task tdd:next
+
+# Set specific phase
+task tdd:red       # Write failing tests
+task tdd:green     # Make tests pass
+task tdd:refactor  # Improve code
+```
+
+### TDD Commands
+
+| Command | Description |
+|---------|-------------|
+| `/tdd status` | Show current TDD phase |
+| `/tdd red` | Start RED phase |
+| `/tdd green` | Start GREEN phase |
+| `/tdd refactor` | Start REFACTOR phase |
+| `/tdd next` | Move to next phase |
+| `/tdd check <file>` | Check if tests exist |
+| `/tdd coverage` | Show coverage report |
+
+### Test File Conventions
+
+| Language | Source File | Test File |
+|----------|-------------|-----------|
+| Go | `user.go` | `user_test.go` |
+| Python | `user.py` | `test_user.py` |
+| TypeScript | `user.ts` | `user.test.ts` |
+| Rust | `user.rs` | `tests/user.rs` |
+
+### TDD + Multi-Agent Integration
+
+The TDD workflow integrates with multi-agent review:
+
+1. **RED Phase**: Write tests (triggers code-review reminder)
+2. **GREEN Phase**: Implement (triggers code-review reminder)
+3. **REFACTOR Phase**: Improve (triggers code-review reminder)
+4. **Review**: Run code-reviewer agent before commit
+
+### Ralph Loop Integration
+
+For continuous TDD with automated test execution:
+
+```bash
+/ralph-loop start
+```
+
+This activates the automated RED → GREEN → REFACTOR cycle with test verification at each step.
+
+---
+
 ## References
 
 - [Multi-Agent Workflow Architecture](../docs/MULTI-AGENT-WORKFLOW.md)
+- [TDD Requirements](.claude/rules/tdd-requirements.md)
 - [Claude Code Memory](https://code.claude.com/docs/en/memory)
 - [Claude Code Checkpointing](https://code.claude.com/docs/en/checkpointing)

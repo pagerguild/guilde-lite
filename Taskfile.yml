@@ -996,3 +996,41 @@ tasks:
     desc: "Reset multi-agent metrics (with backup)"
     cmds:
       - bash scripts/multi-agent-metrics.sh reset
+
+  # ===========================================================================
+  # TDD (TEST-DRIVEN DEVELOPMENT) TASKS
+  # ===========================================================================
+  tdd:status:
+    desc: "Show current TDD phase and status"
+    cmds:
+      - bash scripts/tdd-enforcer.sh status
+
+  tdd:red:
+    desc: "Set TDD phase to RED (write failing test)"
+    cmds:
+      - bash scripts/tdd-enforcer.sh phase red
+
+  tdd:green:
+    desc: "Set TDD phase to GREEN (make test pass)"
+    cmds:
+      - bash scripts/tdd-enforcer.sh phase green
+
+  tdd:refactor:
+    desc: "Set TDD phase to REFACTOR (improve code)"
+    cmds:
+      - bash scripts/tdd-enforcer.sh phase refactor
+
+  tdd:next:
+    desc: "Move to next TDD phase"
+    cmds:
+      - bash scripts/tdd-enforcer.sh phase next
+
+  tdd:check:
+    desc: "Check if tests exist for a file"
+    cmds:
+      - bash scripts/tdd-enforcer.sh check {{.CLI_ARGS}}
+
+  tdd:coverage:
+    desc: "Show test coverage report"
+    cmds:
+      - bash scripts/tdd-enforcer.sh coverage

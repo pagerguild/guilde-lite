@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "MULTI-AGENT CODE REVIEW REQUIREMENT: You are about to write code. After completing this write operation, you MUST invoke a code-reviewer agent (pr-review-toolkit:code-reviewer or tdd-workflows:code-reviewer) before committing. Track this requirement mentally and ensure review happens."
+            "prompt": "TDD + CODE REVIEW ENFORCEMENT:\n\n1. TDD CHECK: Before writing implementation code, verify:\n   - Current TDD phase (run: bash scripts/tdd-enforcer.sh phase)\n   - RED phase: Should be writing TEST files (*_test.go, test_*.py, *.test.ts)\n   - GREEN/REFACTOR: Implementation allowed\n\n2. CODE REVIEW: After this write, you MUST invoke code-reviewer agent before committing.\n\nIf writing implementation in RED phase, suggest writing tests first."
           }
         ]
       },
@@ -24,7 +24,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "MULTI-AGENT CODE REVIEW REQUIREMENT: You are about to edit code. After completing substantive edits (not typos/formatting), you MUST invoke a code-reviewer agent before committing. Track this requirement mentally and ensure review happens."
+            "prompt": "TDD + CODE REVIEW ENFORCEMENT:\n\n1. TDD CHECK: For substantive edits, verify current TDD phase.\n   - RED phase: Prefer editing test files\n   - GREEN: Minimal edits to pass tests\n   - REFACTOR: Improve without changing behavior\n\n2. CODE REVIEW: After substantive edits, invoke code-reviewer before committing."
           }
         ]
       },
@@ -99,7 +99,7 @@
           },
           {
             "type": "prompt",
-            "prompt": "CODE CHANGE RECORDED: A file was written. Remember: You MUST invoke code-reviewer agent before committing. Use 'bash scripts/multi-agent-metrics.sh track code_change_reviewed' after review completes to clear the pending review status."
+            "prompt": "CODE CHANGE + TDD RECORDED:\n1. Pending code review required before commit\n2. TDD: If you wrote a TEST file in RED phase, consider running it to verify it FAILS, then move to GREEN phase (bash scripts/tdd-enforcer.sh phase green)\n3. If you wrote IMPLEMENTATION in GREEN phase, run tests to verify they PASS, then move to REFACTOR phase"
           }
         ]
       },
@@ -112,7 +112,7 @@
           },
           {
             "type": "prompt",
-            "prompt": "CODE CHANGE RECORDED: A file was edited. Remember: You MUST invoke code-reviewer agent before committing. Use 'bash scripts/multi-agent-metrics.sh track code_change_reviewed' after review completes to clear the pending review status."
+            "prompt": "CODE CHANGE + TDD RECORDED:\n1. Pending code review required before commit\n2. TDD: After edits, run relevant tests to ensure they still pass\n3. In REFACTOR phase, ensure no behavior changes (tests should pass)"
           }
         ]
       },
