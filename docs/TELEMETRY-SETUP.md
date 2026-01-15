@@ -299,42 +299,69 @@ To send telemetry to a remote backend (e.g., Grafana Cloud):
 
 ## Validation Testing
 
-The telemetry pipeline has been validated end-to-end. Here's how to verify it works:
+The telemetry pipeline can be validated using the automated validation script.
 
-### 1. Start the Quick Stack
+### Automated Validation
+
+```bash
+# Run full validation suite
+task telemetry:validate
+
+# Or directly
+bash scripts/validate-telemetry.sh
+```
+
+The validation script will:
+1. Check backend connectivity (OTLP, Prometheus, Grafana)
+2. Send test metrics and logs to the OTLP endpoint
+3. Query backends to verify data was received
+4. Export all telemetry data to JSON files for inspection
+
+### Validation Commands
+
+| Command | Description |
+|---------|-------------|
+| `task telemetry:validate` | Run full validation suite |
+| `task telemetry:validate:send` | Send test data only |
+| `task telemetry:validate:query` | Query backends only |
+| `task telemetry:validate:export` | Export data to JSON |
+
+### Manual Validation Steps
+
+#### 1. Start the Quick Stack
 
 ```bash
 docker compose -f docker/observability-compose.yml --profile quick up -d
 ```
 
-### 2. Verify OTEL Collector is Reachable
+#### 2. Verify OTEL Collector is Reachable
 
 ```bash
 bash scripts/telemetry-hook.sh status
 # Should show: ✓ OTEL Collector: http://localhost:4317 (reachable)
 ```
 
-### 3. Run a Multi-Agent Workflow
+#### 3. Send Test Data and Query
 
 ```bash
-# Start session
-bash scripts/telemetry-hook.sh session-start
+# Send test metrics
+bash scripts/validate-telemetry.sh send
 
-# Run any multi-agent task (e.g., using the Explore agent)
-# This generates tool calls and agent spawns
-
-# End session
-bash scripts/telemetry-hook.sh session-end
+# Query what was received
+bash scripts/validate-telemetry.sh query
 ```
 
-### 4. Verify Metrics in Prometheus
+#### 4. Export Data for Analysis
 
 ```bash
-# Check collector is receiving data
-curl -s "http://localhost:9090/api/v1/query?query=otelcol_receiver_accepted_metric_points_total" | jq '.data.result[].value[1]'
+# Export to /tmp/telemetry-validation/
+bash scripts/validate-telemetry.sh export
+
+# View exported metrics
+cat /tmp/telemetry-validation/metric_names.json | jq '.data'
 ```
 
-### 5. Access Grafana Dashboard
+#### 5. Access Grafana Dashboard
 
 Open http://localhost:3000 (admin/admin) and navigate to the Claude Agent Workflow dashboard.
 
@@ -344,10 +371,38 @@ Open http://localhost:3000 (admin/admin) and navigate to the Claude Agent Workfl
 |------|--------|
 | Quick stack starts | ✓ Pass |
 | OTEL endpoint accepts metrics | ✓ Pass (HTTP 200) |
-| Metrics appear in Prometheus | ✓ Pass (test_counter_total visible) |
-| Logs accepted by collector | ✓ Pass (2 records received) |
+| Metrics appear in Prometheus | ✓ Pass (validation_test_counter visible) |
+| Logs accepted by collector | ✓ Pass (records received) |
+| Data export works | ✓ Pass (JSON files exported) |
 | Session tracking works | ✓ Pass (archived to history) |
-| Multi-agent workflow tracked | ✓ Pass (1 Explore agent, 1 Task tool call) |
+| Multi-agent workflow tracked | ✓ Pass (Explore agent, Task tool calls) |
+
+### Querying OTLP Data
+
+Data sent to the OTLP endpoint can be queried from the backends:
+
+**Prometheus Metrics:**
+```bash
+# Query specific metric
+curl -s "http://localhost:9090/api/v1/query?query=validation_test_counter_total" | jq '.'
+
+# List all metrics
+curl -s "http://localhost:9090/api/v1/label/__name__/values" | jq '.data'
+
+# Query collector stats
+curl -s "http://localhost:9090/api/v1/query?query=otelcol_receiver_accepted_metric_points_total" | jq '.'
+```
+
+**Example Response:**
+```json
+{
+  "metric": {
+    "__name__": "validation_test_counter_total",
+    "service_name": "telemetry-validator"
+  },
+  "value": ["1736926931.964", "1"]
+}
+```
 
 ## Related Documentation
 

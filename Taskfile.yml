@@ -1204,6 +1204,26 @@ tasks:
       - echo ""
       - echo "Source with: source .env.telemetry"
 
+  telemetry:validate:
+    desc: "Run full telemetry validation suite"
+    cmds:
+      - bash scripts/validate-telemetry.sh all
+
+  telemetry:validate:send:
+    desc: "Send test data to OTLP endpoint"
+    cmds:
+      - bash scripts/validate-telemetry.sh send
+
+  telemetry:validate:query:
+    desc: "Query telemetry backends for data"
+    cmds:
+      - bash scripts/validate-telemetry.sh query
+
+  telemetry:validate:export:
+    desc: "Export telemetry data to JSON files"
+    cmds:
+      - bash scripts/validate-telemetry.sh export
+
   otel:logs:
     desc: "View Alloy collector logs"
     cmds:
