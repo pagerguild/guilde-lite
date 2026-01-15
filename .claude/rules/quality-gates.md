@@ -66,6 +66,57 @@ publishing:
 
 ---
 
+## Multi-Stage Review Pipeline
+
+### Stage 1: Automated Checks (Required)
+
+Run before any commit:
+
+```bash
+bash scripts/review-pipeline.sh staged --quick
+```
+
+Must pass:
+- Linting (all configured linters)
+- Tests (all test suites)
+- Type checking
+
+### Stage 2: Agent Reviews (Required for substantive changes)
+
+For changes affecting:
+- Security-sensitive code
+- Public APIs
+- Architecture/patterns
+- More than 3 files
+
+Launch parallel review agents:
+
+| Agent | Type | Focus |
+|-------|------|-------|
+| `pr-review-toolkit:code-reviewer` | Opus | Bugs, quality, conventions |
+| `full-stack-orchestration:security-auditor` | Opus | OWASP, auth, injection |
+| `code-review-ai:architect-review` | Opus | Patterns, scalability, tech debt |
+
+### Stage 3: Consensus (Required for critical changes)
+
+For architecture decisions or security-critical code:
+- Multiple agents must agree
+- No CRITICAL or HIGH severity issues
+- Document any accepted risks
+
+---
+
+## Issue Severity Levels
+
+| Level | Description | Action |
+|-------|-------------|--------|
+| CRITICAL | Security vulnerabilities, data loss risk | Must fix before merge |
+| HIGH | Bugs, major code issues | Should fix before merge |
+| MEDIUM | Code quality, minor issues | Fix in follow-up |
+| LOW | Style, suggestions | Optional |
+
+---
+
 ## Gate Bypass Protocol
 
 When a gate must be bypassed:
@@ -74,3 +125,15 @@ When a gate must be bypassed:
 2. **Get explicit approval** from user
 3. **Create follow-up task** to address the bypass
 4. **Never bypass** security gates without review
+
+---
+
+## Review Pipeline Command
+
+Use `/review-all` to run the full pipeline:
+
+```
+/review-all staged    # Review staged changes
+/review-all branch    # Review branch vs main
+/review-all --quick   # Stage 1 only
+```

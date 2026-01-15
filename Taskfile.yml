@@ -620,6 +620,34 @@ tasks:
     cmds:
       - bun test || true
 
+  # ===========================================================================
+  # CODE REVIEW TASKS
+  # ===========================================================================
+  review:
+    desc: "Run full review pipeline (Stage 1 + guidance for Stage 2)"
+    cmds:
+      - bash scripts/review-pipeline.sh staged
+
+  review:quick:
+    desc: "Run Stage 1 automated checks only"
+    cmds:
+      - bash scripts/review-pipeline.sh staged --quick
+
+  review:staged:
+    desc: "Review staged changes"
+    cmds:
+      - bash scripts/review-pipeline.sh staged
+
+  review:unstaged:
+    desc: "Review unstaged changes"
+    cmds:
+      - bash scripts/review-pipeline.sh unstaged
+
+  review:branch:
+    desc: "Review branch vs main"
+    cmds:
+      - bash scripts/review-pipeline.sh branch
+
   build:
     desc: "Build all artifacts"
     cmds:
