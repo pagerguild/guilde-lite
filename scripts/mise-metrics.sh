@@ -32,17 +32,37 @@ fi
 track_event() {
     local event="$1"
     local details="${2:-}"
-    local timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-    local project=$(basename "$(pwd)")
 
-    # Create JSON event
-    local json="{\"ts\":\"$timestamp\",\"event\":\"$event\",\"project\":\"$project\""
-    if [[ -n "$details" ]]; then
-        # Escape details for JSON
-        details=$(echo "$details" | sed 's/"/\\"/g' | tr '\n' ' ')
-        json="$json,\"details\":\"$details\""
+    # Validate event name against allowed events
+    local valid_events="pip_violation npm_violation legacy_violation mise_install mise_use uv_usage bun_usage"
+    if ! echo "$valid_events" | grep -qw "$event"; then
+        echo "Error: Unknown event '$event'" >&2
+        echo "Valid events: $valid_events" >&2
+        return 1
     fi
-    json="$json}"
+
+    local timestamp
+    timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+    # Sanitize event and project to prevent JSON injection
+    local project
+    project=$(basename "$(pwd)" | tr -d '"\n\\' | cut -c1-100)
+    event=$(printf '%s' "$event" | tr -d '"\n\\' | cut -c1-100)
+
+    # Sanitize details for JSON (remove quotes, newlines, backslashes)
+    if [[ -n "$details" ]]; then
+        details=$(printf '%s' "$details" | tr -d '"\n\\' | cut -c1-200)
+    fi
+
+    # Create JSON event using printf for safety
+    local json
+    if [[ -n "$details" ]]; then
+        json=$(printf '{"ts":"%s","event":"%s","project":"%s","details":"%s"}' \
+            "$timestamp" "$event" "$project" "$details")
+    else
+        json=$(printf '{"ts":"%s","event":"%s","project":"%s"}' \
+            "$timestamp" "$event" "$project")
+    fi
 
     echo "$json" >> "$METRICS_FILE"
 
