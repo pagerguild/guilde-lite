@@ -5,8 +5,8 @@
         "matcher": "Bash",
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "MISE-FIRST ENFORCEMENT: Before running this command, check if it violates mise-first patterns:\n\n1. BLOCK: pip install → Use 'uv pip install' or 'uvx' instead\n2. BLOCK: npm install (for global tools) → Use 'mise use npm:<pkg>@latest' or 'bun add'\n3. WARN: brew install <runtime> → Use 'mise use <runtime>@latest' for node/python/go/rust\n4. WARN: nvm/pyenv/rbenv commands → Migrate to mise\n\nIf the command violates these patterns, suggest the mise-first alternative. Only proceed if user confirms or command is compliant."
+            "type": "command",
+            "command": "bash scripts/mise-reminder.sh 2>/dev/null || true"
           }
         ]
       },
@@ -14,8 +14,8 @@
         "matcher": "Write",
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "TDD + CODE REVIEW ENFORCEMENT:\n\n1. TDD CHECK: Before writing implementation code, verify:\n   - Current TDD phase (run: bash scripts/tdd-enforcer.sh phase)\n   - RED phase: Should be writing TEST files (*_test.go, test_*.py, *.test.ts)\n   - GREEN/REFACTOR: Implementation allowed\n\n2. CODE REVIEW: After this write, you MUST invoke code-reviewer agent before committing.\n\nIf writing implementation in RED phase, suggest writing tests first."
+            "type": "command",
+            "command": "bash scripts/tdd-reminder.sh 2>/dev/null || true"
           }
         ]
       },
@@ -23,8 +23,8 @@
         "matcher": "Edit",
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "TDD + CODE REVIEW ENFORCEMENT:\n\n1. TDD CHECK: For substantive edits, verify current TDD phase.\n   - RED phase: Prefer editing test files\n   - GREEN: Minimal edits to pass tests\n   - REFACTOR: Improve without changing behavior\n\n2. CODE REVIEW: After substantive edits, invoke code-reviewer before committing."
+            "type": "command",
+            "command": "bash scripts/tdd-reminder.sh 2>/dev/null || true"
           }
         ]
       },
@@ -64,8 +64,8 @@
       {
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "MULTI-AGENT WORKFLOW ENFORCEMENT: Before responding, consider if this task requires parallel subagents. For research tasks, use Explore agents. For code changes, plan to invoke code-reviewer and test-automator agents. For validation, launch multiple validators in parallel. Skip multi-agent only for trivial tasks (single file reads, direct questions with known answers). See .claude/rules/multi-agent-workflow.md for requirements."
+            "type": "command",
+            "command": "bash scripts/multi-agent-reminder.sh 2>/dev/null || true"
           }
         ]
       }
@@ -82,8 +82,8 @@
             "command": "bash scripts/preserve-context.sh --save 2>/dev/null || echo 'Context preservation skipped'"
           },
           {
-            "type": "prompt",
-            "prompt": "CONTEXT PRESERVATION: Before compaction, ensure you have updated .claude/SESSION_HANDOFF.md with: 1) Current task status, 2) Key decisions made, 3) Files modified, 4) Next steps for resumption. This ensures continuity across sessions."
+            "type": "command",
+            "command": "bash scripts/context-preservation-reminder.sh 2>/dev/null || true"
           }
         ]
       }
@@ -114,8 +114,8 @@
             "command": "bash scripts/multi-agent-metrics.sh track code_change_no_review 2>/dev/null || true"
           },
           {
-            "type": "prompt",
-            "prompt": "CODE CHANGE + TDD RECORDED:\n1. Pending code review required before commit\n2. TDD: If you wrote a TEST file in RED phase, consider running it to verify it FAILS, then move to GREEN phase (bash scripts/tdd-enforcer.sh phase green)\n3. If you wrote IMPLEMENTATION in GREEN phase, run tests to verify they PASS, then move to REFACTOR phase\n4. DOC-SYNC: If this changes public APIs, configs, or workflows, check if documentation needs updating (bash scripts/doc-sync-check.sh check <file>)"
+            "type": "command",
+            "command": "bash scripts/post-code-reminder.sh 2>/dev/null || true"
           }
         ]
       },
@@ -127,8 +127,8 @@
             "command": "bash scripts/multi-agent-metrics.sh track code_change_no_review 2>/dev/null || true"
           },
           {
-            "type": "prompt",
-            "prompt": "CODE CHANGE + TDD RECORDED:\n1. Pending code review required before commit\n2. TDD: After edits, run relevant tests to ensure they still pass\n3. In REFACTOR phase, ensure no behavior changes (tests should pass)\n4. DOC-SYNC: If this changes public APIs, configs, or workflows, check if documentation needs updating"
+            "type": "command",
+            "command": "bash scripts/post-code-reminder.sh 2>/dev/null || true"
           }
         ]
       },
@@ -245,6 +245,8 @@
     "customer-sales-automation@claude-code-workflows": true,
     "arm-cortex-microcontrollers@claude-code-workflows": true,
     "julia-development@claude-code-workflows": true,
-    "rust-analyzer-lsp@claude-plugins-official": true
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "vercel@claude-plugins-official": true
   }
 }

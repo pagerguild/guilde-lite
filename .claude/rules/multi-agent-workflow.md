@@ -1,38 +1,42 @@
-# Multi-Agent Workflow Enforcement
+# Multi-Agent Workflow Guidelines
 
-Rules for enforcing parallel subagent usage on every user prompt.
+Guidelines for using parallel subagents effectively (not strict enforcement).
 
 ---
 
 ## Core Principle
 
-**EVERY substantive user request MUST leverage parallel subagents for:**
-1. Research and exploration
-2. Validation and verification
-3. Code review
-4. Documentation updates
+**For complex tasks, consider leveraging parallel subagents for:**
+1. Large-scale codebase exploration
+2. Code review before commits
+3. Multi-file validation
+4. Comprehensive documentation updates
 
 ---
 
-## When to Use Multi-Agent Workflow
+## When to Consider Multi-Agent Workflow
 
-### ALWAYS Use Subagents For
+### Good Candidates for Subagents
 
-| Task Type | Required Agents | Minimum |
-|-----------|-----------------|---------|
-| Code changes | code-reviewer, test-automator | 2 |
-| Research questions | Explore (multiple paths) | 2-3 |
-| Bug investigation | debugger, error-detective | 2 |
-| New features | architect-review, code-reviewer | 2 |
-| Documentation | docs-architect, tutorial-engineer | 2 |
-| Validation | Tool-specific validators | 2+ |
+| Task Type | Suggested Agents | When Useful |
+|-----------|------------------|-------------|
+| Multi-file code changes | code-reviewer | Before commits |
+| Deep codebase exploration | Explore agent | Unknown architecture |
+| Complex bug investigation | debugger agents | Non-obvious issues |
+| New feature implementation | architect + reviewer | Significant additions |
+| Documentation overhaul | docs-architect | Major rewrites |
 
-### Skip Multi-Agent Only For
+### DO NOT Require Subagents For
 
-- Simple file reads (single file)
+**Simple tasks should be handled directly:**
+- Status questions ("what is X?", "where is Y?")
+- Simple file reads (single file lookups)
 - Direct questions with known answers
+- Quick explanations or clarifications
+- Single-file edits or typo fixes
+- Checking configuration values
+- Answering "how does X work?" for small scopes
 - Commands explicitly requesting single-agent
-- Trivial edits (typos, formatting)
 
 ---
 
@@ -81,108 +85,104 @@ documentation_tasks:
 
 ---
 
-## Parallel Execution Requirements
+## When Parallel Execution Helps
 
-### Minimum Parallelism
+### Good Uses of Parallelism
 
-1. **Research tasks:** Launch 2-3 Explore agents with different search strategies
-2. **Validation tasks:** Launch all relevant validators simultaneously
-3. **Review tasks:** Launch code-reviewer AND type-specific reviewers together
+1. **Large research tasks:** Multiple Explore agents with different search strategies
+2. **Validation tasks:** Multiple validators to catch different issues
+3. **Review tasks:** Multiple reviewers for comprehensive coverage
 
-### Example Patterns
+### Example Patterns (Suggestions, Not Requirements)
 
-#### Pattern 1: Research Question
+#### Pattern 1: Complex Research Question
 ```
 User: "How does authentication work in this codebase?"
 
-Required response:
-- Launch Explore agent (thoroughness: "very thorough")
-- Search auth-related files, patterns, and flows
-- Synthesize findings from multiple exploration paths
+If codebase is large/unfamiliar:
+- Consider Explore agent for thorough search
+- Synthesize findings
+
+If you already know the codebase:
+- Just read the relevant files directly
 ```
 
-#### Pattern 2: Code Change
+#### Pattern 2: Significant Code Change
 ```
 User: "Add a new endpoint for user preferences"
 
-Required response:
-1. Planning phase: Use Plan agent OR feature-dev:code-architect
-2. Implementation phase: Write code
-3. Validation phase (PARALLEL):
-   - pr-review-toolkit:code-reviewer
-   - tdd-workflows:tdd-orchestrator
-   - security-scanning:security-auditor
+Suggested approach:
+1. Planning: Consider Plan agent for architecture
+2. Implementation: Write code
+3. Before commit: Consider code review
+
+For small/simple changes, skip the ceremony.
 ```
 
-#### Pattern 3: Bug Fix
+#### Pattern 3: Complex Bug Fix
 ```
 User: "Fix the authentication timeout bug"
 
-Required response:
-1. Investigation (PARALLEL):
-   - debugging-toolkit:debugger
-   - error-debugging:error-detective
-2. Fix implementation
-3. Validation (PARALLEL):
-   - unit-testing:test-automator
-   - pr-review-toolkit:silent-failure-hunter
+If bug is non-obvious:
+- Consider investigation agents
+- Run tests after fix
+
+If bug is straightforward:
+- Just fix it and run tests
 ```
 
 ---
 
-## Enforcement Hooks (STRICT)
+## Hook Integration (Optional Tracking)
 
 ### PreToolUse Hooks
 
 **Write/Edit Tool Hooks:**
-- Display reminder: "MULTI-AGENT CODE REVIEW REQUIREMENT"
-- Claude must mentally track that review is required
+- Reminder for code review consideration (not blocking)
+- Track tool usage for metrics
 
 **Task Tool Hooks:**
-- Track `agent_invoked` event automatically
+- Track `agent_invoked` event for analytics
 - Record which agents are being used
 
 ### PostToolUse Hooks
 
 **Write/Edit Tool Hooks:**
-- Track `code_change_no_review` event automatically
-- Display reminder about pending review requirement
-- Increment pending review counter
+- Track code changes for metrics
+- Reminder about code review (non-blocking)
 
 **Task Tool Hooks (for code-reviewer):**
-- Detect when code-reviewer agent is invoked
-- Track `code_change_reviewed` event
-- Clear pending review counter
+- Track when code-reviewer agent is used
+- Update metrics
 
-### Metrics Tracking
+### Metrics Tracking (Optional)
 
-All compliance is tracked via `scripts/multi-agent-metrics.sh`:
+Usage metrics tracked via `scripts/multi-agent-metrics.sh`:
 
 ```bash
-# Check pending reviews
+# Check metrics
 bash scripts/multi-agent-metrics.sh check
 
-# View compliance report
+# View report
 bash scripts/multi-agent-metrics.sh report
 
-# Export metrics as JSON
+# Export as JSON
 bash scripts/multi-agent-metrics.sh json
 ```
 
-### Commit Blocking (CRITICAL)
+### Code Review Recommendation
 
-Before ANY commit:
-1. Check `scripts/multi-agent-metrics.sh check` for pending reviews
-2. If pending reviews exist, BLOCK commit and invoke code-reviewer
-3. Only after review clears pending count, proceed with commit
+For substantive code changes (multi-file, new features):
+1. Consider running code-reviewer before commit
+2. This is a recommendation, not a hard block
+3. Use judgment based on change scope
 
 ### SessionStart Hook
 
 On session start:
 - Load active track context from conductor/tracks.md
 - Display current task and pending items
-- Remind about multi-agent requirements
-- Show pending review count if any
+- Show workflow guidance (not enforcement)
 
 ---
 
@@ -204,23 +204,26 @@ Multiple Task tool calls in SINGLE message:
 
 ---
 
-## Violations and Recovery
+## When to Reconsider Approach
 
-### If Multi-Agent Not Used
+### Signs You Might Benefit from Subagents
 
-1. **Stop** current approach
-2. **Identify** appropriate subagents for the task
-3. **Launch** parallel agents
-4. **Synthesize** results before proceeding
+If you find yourself:
+- Searching across many files with uncertain results
+- Making changes that affect multiple systems
+- Investigating a complex bug with unclear root cause
+- Needing diverse perspectives on architecture
 
-### Common Violations
+Consider using subagents for these scenarios.
 
-| Violation | Recovery |
-|-----------|----------|
-| Direct code edit without review | Launch code-reviewer agent |
-| Research without Explore agent | Restart with proper exploration |
-| Validation skipped | Launch validation agents before commit |
-| Single-path exploration | Add parallel exploration paths |
+### When Direct Approach is Fine
+
+| Scenario | Approach |
+|----------|----------|
+| Simple status question | Answer directly |
+| Single file lookup | Read the file |
+| Known configuration check | Check directly |
+| Straightforward explanation | Explain directly |
 
 ---
 
@@ -243,8 +246,8 @@ workflow_tracking:
 
 ## Best Practices Summary
 
-1. **Default to parallel** - Launch multiple agents simultaneously
-2. **Synthesize results** - Combine agent outputs intelligently
-3. **Track progress** - Use TodoWrite for visibility
-4. **Validate always** - Never skip code review or tests
-5. **Document changes** - Update context.md after significant work
+1. **Use judgment** - Match tool complexity to task complexity
+2. **Parallel when beneficial** - Launch multiple agents for complex tasks
+3. **Direct when simple** - Answer straightforward questions directly
+4. **Track complex work** - Use TodoWrite for multi-step tasks
+5. **Review before commits** - Consider code review for substantive changes
