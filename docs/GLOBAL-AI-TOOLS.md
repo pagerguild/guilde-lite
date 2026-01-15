@@ -41,15 +41,21 @@ Two-part fix:
 Create `~/.config/mise/config.toml`:
 
 ```toml
+# Pattern: Global uses "latest" for everything.
+# Projects can override with specific versions when needed.
+
 [tools]
 "npm:@google/gemini-cli" = "latest"
 "npm:@openai/codex" = "latest"
 opencode = "latest"
-node = "lts"
+node = "latest"
 bun = "latest"
 uv = "latest"
+python = "latest"
 jj = "latest"
 ```
+
+**Important**: Always use `"latest"` in global config. Projects can pin specific versions in their `mise.toml` when needed.
 
 ### 2. Shims in PATH
 
@@ -69,13 +75,17 @@ If you prefer manual setup:
 # 1. Create global config directory
 mkdir -p ~/.config/mise
 
-# 2. Create global config
+# 2. Create global config (use "latest" for everything)
 cat > ~/.config/mise/config.toml << 'EOF'
 [tools]
 "npm:@google/gemini-cli" = "latest"
 "npm:@openai/codex" = "latest"
 opencode = "latest"
-node = "lts"
+node = "latest"
+python = "latest"
+bun = "latest"
+uv = "latest"
+jj = "latest"
 EOF
 
 # 3. Trust and install
@@ -191,4 +201,18 @@ opencode --version
 | Project | `./mise.toml` | Only in that directory |
 | Global | `~/.config/mise/config.toml` | Everywhere (via shims) |
 
-Project configs **override** global configs for the same tool, so you can have different versions per-project while maintaining global defaults.
+### The Pattern
+
+1. **Global config**: Always use `"latest"` for all tools
+2. **Project config**: Override only when you need a specific version
+
+```
+Global (~/.config/mise/config.toml)     Project (./mise.toml)
+┌────────────────────────────────┐      ┌─────────────────────────┐
+│ node = "latest"                │ ──►  │ node = "22"  # override │
+│ python = "latest"              │      │ # inherits python       │
+│ bun = "latest"                 │      │ go = "latest"  # add    │
+└────────────────────────────────┘      └─────────────────────────┘
+```
+
+Project configs **override** global configs for the same tool, so you can pin specific versions per-project while global defaults stay at latest.

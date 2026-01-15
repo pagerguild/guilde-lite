@@ -36,6 +36,9 @@ cat > "$MISE_GLOBAL_CONFIG" << 'EOF'
 #
 # Location: ~/.config/mise/config.toml
 # Docs: https://mise.jdx.dev/configuration.html
+#
+# Pattern: Global uses "latest" for everything.
+# Projects can override with specific versions when needed.
 
 [tools]
 # AI CLI Tools - available globally
@@ -43,11 +46,11 @@ cat > "$MISE_GLOBAL_CONFIG" << 'EOF'
 "npm:@openai/codex" = "latest"
 opencode = "latest"
 
-# Essential global utilities
-node = "lts"
+# Essential runtimes (defaults to latest, projects can pin specific versions)
+node = "latest"
 bun = "latest"
 uv = "latest"
-python = "3.13"
+python = "latest"
 
 # Version control
 jj = "latest"
