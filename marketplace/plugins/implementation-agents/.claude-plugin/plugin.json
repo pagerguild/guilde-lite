@@ -1,0 +1,8 @@
+{
+  "name": "implementation-agents",
+  "description": "Development and implementation agents for backend, frontend, database, and test automation.",
+  "author": {
+    "name": "pagerguild",
+    "email": "team@pagerguild.dev"
+  }
+}

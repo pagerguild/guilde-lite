@@ -1,0 +1,107 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "guilde-plugins",
+  "description": "Workflow automation, TDD, code review, and development tools for Claude Code",
+  "owner": {
+    "name": "pagerguild",
+    "email": "team@pagerguild.dev"
+  },
+  "plugins": [
+    {
+      "name": "conductor-workflows",
+      "description": "Slash commands for orchestrating multi-phase implementation workflows using the conductor pattern",
+      "version": "1.0.0",
+      "author": {"name": "pagerguild", "email": "team@pagerguild.dev"},
+      "source": "./plugins/conductor-workflows",
+      "category": "workflow"
+    },
+    {
+      "name": "tdd-automation",
+      "description": "Test-driven development workflow with red/green/refactor phases and coverage monitoring",
+      "version": "1.0.0",
+      "author": {"name": "pagerguild", "email": "team@pagerguild.dev"},
+      "source": "./plugins/tdd-automation",
+      "category": "development"
+    },
+    {
+      "name": "multi-agent-review",
+      "description": "Parallel code review agents for comprehensive quality assurance",
+      "version": "1.0.0",
+      "author": {"name": "pagerguild", "email": "team@pagerguild.dev"},
+      "source": "./plugins/multi-agent-review",
+      "category": "review"
+    },
+    {
+      "name": "exploration-agents",
+      "description": "Codebase exploration and analysis agents for understanding unfamiliar code",
+      "version": "1.0.0",
+      "author": {"name": "pagerguild", "email": "team@pagerguild.dev"},
+      "source": "./plugins/exploration-agents",
+      "category": "exploration"
+    },
+    {
+      "name": "implementation-agents",
+      "description": "Development agents for backend, frontend, database, and test automation",
+      "version": "1.0.0",
+      "author": {"name": "pagerguild", "email": "team@pagerguild.dev"},
+      "source": "./plugins/implementation-agents",
+      "category": "development"
+    },
+    {
+      "name": "spec-agents",
+      "description": "Specification building agent for creating detailed specs and acceptance criteria",
+      "version": "1.0.0",
+      "author": {"name": "pagerguild", "email": "team@pagerguild.dev"},
+      "source": "./plugins/spec-agents",
+      "category": "planning"
+    },
+    {
+      "name": "mise-tools",
+      "description": "Mise-first development environment management with version control",
+      "version": "1.0.0",
+      "author": {"name": "pagerguild", "email": "team@pagerguild.dev"},
+      "source": "./plugins/mise-tools",
+      "category": "tools"
+    },
+    {
+      "name": "context-preservation",
+      "description": "Session state management and error recovery for long-running workflows",
+      "version": "1.0.0",
+      "author": {"name": "pagerguild", "email": "team@pagerguild.dev"},
+      "source": "./plugins/context-preservation",
+      "category": "workflow"
+    },
+    {
+      "name": "diagram-generation",
+      "description": "Mermaid and C4 diagram generation for architecture visualization",
+      "version": "1.0.0",
+      "author": {"name": "pagerguild", "email": "team@pagerguild.dev"},
+      "source": "./plugins/diagram-generation",
+      "category": "documentation"
+    },
+    {
+      "name": "code-review-pipeline",
+      "description": "Multi-stage code review workflow with parallel agent reviews",
+      "version": "1.0.0",
+      "author": {"name": "pagerguild", "email": "team@pagerguild.dev"},
+      "source": "./plugins/code-review-pipeline",
+      "category": "review"
+    },
+    {
+      "name": "release-research",
+      "description": "Release notes and changelog research for tracking upstream updates",
+      "version": "1.0.0",
+      "author": {"name": "pagerguild", "email": "team@pagerguild.dev"},
+      "source": "./plugins/release-research",
+      "category": "tools"
+    },
+    {
+      "name": "docs-sync",
+      "description": "Documentation synchronization to keep docs aligned with code",
+      "version": "1.0.0",
+      "author": {"name": "pagerguild", "email": "team@pagerguild.dev"},
+      "source": "./plugins/docs-sync",
+      "category": "documentation"
+    }
+  ]
+}

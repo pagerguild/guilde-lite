@@ -1,0 +1,5 @@
+{
+  "name": "code-review-pipeline",
+  "description": "Multi-stage code review workflow with parallel agent reviews and test generation.",
+  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+}

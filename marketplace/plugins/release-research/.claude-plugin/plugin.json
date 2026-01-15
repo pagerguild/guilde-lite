@@ -1,0 +1,5 @@
+{
+  "name": "release-research",
+  "description": "Release notes and changelog research for tracking upstream updates.",
+  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+}

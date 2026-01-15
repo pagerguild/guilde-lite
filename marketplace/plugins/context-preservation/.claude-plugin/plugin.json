@@ -1,0 +1,5 @@
+{
+  "name": "context-preservation",
+  "description": "Session state management and error recovery for long-running development workflows.",
+  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+}

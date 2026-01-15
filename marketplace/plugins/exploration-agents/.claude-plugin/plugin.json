@@ -1,0 +1,8 @@
+{
+  "name": "exploration-agents",
+  "description": "Codebase exploration and analysis agents for understanding unfamiliar code, tracing dependencies, and researching documentation.",
+  "author": {
+    "name": "pagerguild",
+    "email": "team@pagerguild.dev"
+  }
+}

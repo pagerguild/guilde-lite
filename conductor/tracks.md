@@ -6,33 +6,11 @@
 
 | Track ID | Title | Status | Priority | Phase |
 |----------|-------|--------|----------|-------|
-| MARKETPLACE-001 | Plugin Marketplace Creation | In Progress | P1 | 3 |
+| - | No active tracks | - | - | - |
 
 ## Track Details
 
-### [~] MARKETPLACE-001: Plugin Marketplace Creation
-
-**Priority:** P1
-**Type:** Enhancement
-**Created:** 2026-01-15
-**Status:** Phase 3 - TDD Plugin
-
-**Summary:** Create a public plugin marketplace repository (pagerguild/guilde-plugins) following Claude Code marketplace best practices. Modularize guilde-lite's components into granular, single-purpose plugins.
-
-**Progress:** 9/37 tasks (24%)
-
-**Phases:**
-1. Repository Setup (4/4) ✓
-2. Conductor Plugin (5/5) ✓
-3. TDD Plugin (0/5)
-4. Review Agents Plugin (0/4)
-5. Exploration Agents Plugin (0/4)
-6. Implementation Agents Plugin (0/4)
-7. Utility Plugins (0/6)
-8. Validation & Documentation (0/5)
-
-**Spec:** [conductor/tracks/MARKETPLACE-001/spec.md](tracks/MARKETPLACE-001/spec.md)
-**Plan:** [conductor/tracks/MARKETPLACE-001/plan.md](tracks/MARKETPLACE-001/plan.md)
+*No tracks currently in progress.*
 
 ---
 
@@ -61,8 +39,31 @@ Study and adopt skill authoring patterns from superpowers plugin.
 
 | Track ID | Title | Completed | Checkpoint |
 |----------|-------|-----------|------------|
+| MARKETPLACE-001 | Plugin Marketplace Creation | 2026-01-15 | v1.2.0 |
 | INFRA-001 | Jujutsu & Agentic-Jujutsu Integration | 2026-01-15 | v1.1.0 |
 | MULTI-001 | Multi-Agent Workflow Architecture | 2026-01-15 | v1.0.0 |
+
+### [x] MARKETPLACE-001: Plugin Marketplace Creation
+
+**Priority:** P1
+**Type:** Enhancement
+**Created:** 2026-01-15
+**Completed:** 2026-01-15
+**Release:** v1.2.0
+
+**Summary:** Created public plugin marketplace (pagerguild/guilde-plugins) and local marketplace with 12 modular plugins migrated from guilde-lite.
+
+**Deliverables:**
+- 12 plugins with proper structure
+- 12 commands migrated
+- 13 agents migrated
+- 11 skills migrated
+- marketplace.json validated
+- GitHub repo: pagerguild/guilde-plugins
+- Local marketplace: ./marketplace/
+
+**Spec:** [conductor/tracks/MARKETPLACE-001/spec.md](tracks/MARKETPLACE-001/spec.md)
+**Plan:** [conductor/tracks/MARKETPLACE-001/plan.md](tracks/MARKETPLACE-001/plan.md)
 
 ### [x] INFRA-001: Jujutsu & Agentic-Jujutsu Integration
 

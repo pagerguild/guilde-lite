@@ -1,0 +1,5 @@
+{
+  "name": "diagram-generation",
+  "description": "Mermaid and C4 diagram generation for architecture visualization and documentation.",
+  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+}

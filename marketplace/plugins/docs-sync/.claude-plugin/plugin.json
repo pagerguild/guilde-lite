@@ -1,0 +1,5 @@
+{
+  "name": "docs-sync",
+  "description": "Documentation synchronization to keep docs aligned with code changes.",
+  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+}

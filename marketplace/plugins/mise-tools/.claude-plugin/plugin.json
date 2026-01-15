@@ -1,0 +1,5 @@
+{
+  "name": "mise-tools",
+  "description": "Mise-first development environment management with version control and tool installation.",
+  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+}
