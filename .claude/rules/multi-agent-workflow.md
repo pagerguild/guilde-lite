@@ -130,20 +130,51 @@ Required response:
 
 ---
 
-## Enforcement Hooks
+## Enforcement Hooks (STRICT)
 
-### PreToolUse Hook Checks
+### PreToolUse Hooks
 
-Before writing code, verify:
-- [ ] Plan or exploration completed (for non-trivial changes)
-- [ ] Architecture reviewed (for new features)
+**Write/Edit Tool Hooks:**
+- Display reminder: "MULTI-AGENT CODE REVIEW REQUIREMENT"
+- Claude must mentally track that review is required
 
-### PostToolUse Hook Checks
+**Task Tool Hooks:**
+- Track `agent_invoked` event automatically
+- Record which agents are being used
 
-After code changes, ensure:
-- [ ] Code review agent invoked
-- [ ] Tests run or test agent invoked
-- [ ] Documentation updated if public API changed
+### PostToolUse Hooks
+
+**Write/Edit Tool Hooks:**
+- Track `code_change_no_review` event automatically
+- Display reminder about pending review requirement
+- Increment pending review counter
+
+**Task Tool Hooks (for code-reviewer):**
+- Detect when code-reviewer agent is invoked
+- Track `code_change_reviewed` event
+- Clear pending review counter
+
+### Metrics Tracking
+
+All compliance is tracked via `scripts/multi-agent-metrics.sh`:
+
+```bash
+# Check pending reviews
+bash scripts/multi-agent-metrics.sh check
+
+# View compliance report
+bash scripts/multi-agent-metrics.sh report
+
+# Export metrics as JSON
+bash scripts/multi-agent-metrics.sh json
+```
+
+### Commit Blocking (CRITICAL)
+
+Before ANY commit:
+1. Check `scripts/multi-agent-metrics.sh check` for pending reviews
+2. If pending reviews exist, BLOCK commit and invoke code-reviewer
+3. Only after review clears pending count, proceed with commit
 
 ### SessionStart Hook
 
@@ -151,6 +182,7 @@ On session start:
 - Load active track context from conductor/tracks.md
 - Display current task and pending items
 - Remind about multi-agent requirements
+- Show pending review count if any
 
 ---
 

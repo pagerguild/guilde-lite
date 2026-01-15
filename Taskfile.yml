@@ -962,3 +962,37 @@ tasks:
     desc: "Setup global AI CLI tools"
     cmds:
       - bash scripts/setup-global-ai-tools.sh
+
+  # ===========================================================================
+  # MULTI-AGENT WORKFLOW TASKS
+  # ===========================================================================
+  multi-agent:status:
+    desc: "Show multi-agent workflow compliance status"
+    cmds:
+      - bash scripts/multi-agent-metrics.sh check
+      - bash scripts/multi-agent-metrics.sh json
+
+  multi-agent:report:
+    desc: "Show full multi-agent compliance report"
+    cmds:
+      - bash scripts/multi-agent-metrics.sh report
+
+  multi-agent:check:
+    desc: "Check for pending code reviews"
+    cmds:
+      - bash scripts/multi-agent-metrics.sh check
+
+  multi-agent:clear:
+    desc: "Mark pending reviews as complete (after actual review)"
+    cmds:
+      - bash scripts/multi-agent-metrics.sh track code_change_reviewed
+
+  multi-agent:metrics:json:
+    desc: "Export multi-agent metrics as JSON"
+    cmds:
+      - bash scripts/multi-agent-metrics.sh json
+
+  multi-agent:metrics:reset:
+    desc: "Reset multi-agent metrics (with backup)"
+    cmds:
+      - bash scripts/multi-agent-metrics.sh reset

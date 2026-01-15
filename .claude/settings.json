@@ -9,6 +9,33 @@
             "prompt": "MISE-FIRST ENFORCEMENT: Before running this command, check if it violates mise-first patterns:\n\n1. BLOCK: pip install → Use 'uv pip install' or 'uvx' instead\n2. BLOCK: npm install (for global tools) → Use 'mise use npm:<pkg>@latest' or 'bun add'\n3. WARN: brew install <runtime> → Use 'mise use <runtime>@latest' for node/python/go/rust\n4. WARN: nvm/pyenv/rbenv commands → Migrate to mise\n\nIf the command violates these patterns, suggest the mise-first alternative. Only proceed if user confirms or command is compliant."
           }
         ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "MULTI-AGENT CODE REVIEW REQUIREMENT: You are about to write code. After completing this write operation, you MUST invoke a code-reviewer agent (pr-review-toolkit:code-reviewer or tdd-workflows:code-reviewer) before committing. Track this requirement mentally and ensure review happens."
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "MULTI-AGENT CODE REVIEW REQUIREMENT: You are about to edit code. After completing substantive edits (not typos/formatting), you MUST invoke a code-reviewer agent before committing. Track this requirement mentally and ensure review happens."
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/multi-agent-metrics.sh track agent_invoked 2>/dev/null || true"
+          }
+        ]
       }
     ],
     "SessionStart": [
@@ -60,6 +87,41 @@
           {
             "type": "command",
             "command": "bash -c 'CMD=\"$CLAUDE_TOOL_INPUT\"; if echo \"$CMD\" | grep -qE \"pip install\" && ! echo \"$CMD\" | grep -qE \"uv pip\"; then bash scripts/mise-metrics.sh track pip_violation \"$CMD\" 2>/dev/null; elif echo \"$CMD\" | grep -qE \"npm install -g|npm i -g\"; then bash scripts/mise-metrics.sh track npm_violation \"$CMD\" 2>/dev/null; elif echo \"$CMD\" | grep -qE \"^nvm |^pyenv |^rbenv |^goenv \"; then bash scripts/mise-metrics.sh track legacy_violation \"$CMD\" 2>/dev/null; elif echo \"$CMD\" | grep -qE \"mise install\"; then bash scripts/mise-metrics.sh track mise_install 2>/dev/null; elif echo \"$CMD\" | grep -qE \"mise use\"; then bash scripts/mise-metrics.sh track mise_use 2>/dev/null; elif echo \"$CMD\" | grep -qE \"^uv |^uvx \"; then bash scripts/mise-metrics.sh track uv_usage 2>/dev/null; elif echo \"$CMD\" | grep -qE \"^bun \"; then bash scripts/mise-metrics.sh track bun_usage 2>/dev/null; fi' 2>/dev/null || true"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/multi-agent-metrics.sh track code_change_no_review 2>/dev/null || true"
+          },
+          {
+            "type": "prompt",
+            "prompt": "CODE CHANGE RECORDED: A file was written. Remember: You MUST invoke code-reviewer agent before committing. Use 'bash scripts/multi-agent-metrics.sh track code_change_reviewed' after review completes to clear the pending review status."
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/multi-agent-metrics.sh track code_change_no_review 2>/dev/null || true"
+          },
+          {
+            "type": "prompt",
+            "prompt": "CODE CHANGE RECORDED: A file was edited. Remember: You MUST invoke code-reviewer agent before committing. Use 'bash scripts/multi-agent-metrics.sh track code_change_reviewed' after review completes to clear the pending review status."
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'AGENT=\"$CLAUDE_TOOL_INPUT\"; if echo \"$AGENT\" | grep -qiE \"code-reviewer|review\"; then bash scripts/multi-agent-metrics.sh track code_change_reviewed 2>/dev/null; fi' || true"
           }
         ]
       }
