@@ -35,6 +35,43 @@
 
 ---
 
+## Phase 1.5: VCS Integration for Multi-Agent [checkpoint: 453b1c6]
+
+### Objectives
+- Enable lock-free parallel agent operations via jj (Jujutsu)
+- Set up MCP integration for VCS tools
+- Validate conflict resolution workflow
+
+### Tasks
+
+- [x] Research jj vs git worktrees for multi-agent workflows
+- [x] Research resolver agents (agentic-jujutsu 87% auto-resolution)
+- [x] Create comprehensive tutorial: docs/tutorials/MULTI-AGENT-VCS-TUTORIAL.md
+- [x] Initialize jj colocated mode (`jj git init --colocate`)
+- [x] Create .mcp.json for agentic-jujutsu and jj-mcp-server
+- [x] Create scripts/validate-tool-versions.sh for version enforcement
+- [x] Install and validate all VCS tools:
+  - [x] jj v0.37.0
+  - [x] agentic-jujutsu v2.3.6
+  - [x] jj-mcp-server v1.0.1
+  - [x] @agentdb/sdk v1.1.26
+  - [x] reconcile-ai v1.0.3
+  - [x] ovadare v0.1.4
+- [x] Test parallel jj operations (no lock contention)
+- [x] Test conflict resolution workflow
+- [x] Update docs/MULTI-AGENT-WORKFLOW.md with Extended Tooling section
+- [x] Update conductor/tech-stack.md with Conflict Resolution section
+- [x] Add multi-agent workflow enforcement hook in .claude/settings.json
+
+### Quality Gates
+- [x] jj colocated mode active
+- [x] All 6 tools at required versions
+- [x] Parallel operations succeed without locks
+- [x] Conflict resolution workflow validated
+- [x] Git committed with checkpoint (453b1c6)
+
+---
+
 ## Phase 2: Agent Definitions [checkpoint: pending]
 
 ### Objectives
@@ -339,6 +376,7 @@
 | Phase | Status | Tasks Done | Tasks Total |
 |-------|--------|------------|-------------|
 | 1. Foundation | [x] Complete | 11 | 11 |
+| 1.5. VCS Integration | [x] Complete | 14 | 14 |
 | 2. Agent Definitions | [ ] Pending | 0 | 15 |
 | 3. Context Engineering | [ ] Pending | 0 | 7 |
 | 4. TDD Integration | [ ] Pending | 0 | 9 |
@@ -351,4 +389,4 @@
 | 11. Testing & Validation | [ ] Pending | 0 | 7 |
 | 12. Documentation & Release | [ ] Pending | 0 | 6 |
 
-**Overall Progress:** 11 / 102 tasks (11%)
+**Overall Progress:** 25 / 116 tasks (22%)
