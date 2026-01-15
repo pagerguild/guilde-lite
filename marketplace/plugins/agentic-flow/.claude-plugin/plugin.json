@@ -1,0 +1,5 @@
+{
+  "name": "agentic-flow",
+  "description": "AI agent coordination with QuantumDAG, AgentDB learning, and quantum-resistant signing.",
+  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+}

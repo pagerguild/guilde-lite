@@ -102,6 +102,30 @@
       "author": {"name": "pagerguild", "email": "team@pagerguild.dev"},
       "source": "./plugins/docs-sync",
       "category": "documentation"
+    },
+    {
+      "name": "jj-tools",
+      "description": "Jujutsu (jj) version control commands and workflow guidance",
+      "version": "1.0.0",
+      "author": {"name": "pagerguild", "email": "team@pagerguild.dev"},
+      "source": "./plugins/jj-tools",
+      "category": "tools"
+    },
+    {
+      "name": "agentic-flow",
+      "description": "AI agent coordination with QuantumDAG, AgentDB learning, and quantum-resistant signing",
+      "version": "1.0.0",
+      "author": {"name": "pagerguild", "email": "team@pagerguild.dev"},
+      "source": "./plugins/agentic-flow",
+      "category": "workflow"
+    },
+    {
+      "name": "microsoft-agents",
+      "description": "Microsoft Agent Framework for building AI agents with Python SDK",
+      "version": "1.0.0",
+      "author": {"name": "pagerguild", "email": "team@pagerguild.dev"},
+      "source": "./plugins/microsoft-agents",
+      "category": "development"
     }
   ]
 }

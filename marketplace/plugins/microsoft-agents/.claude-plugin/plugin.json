@@ -1,0 +1,5 @@
+{
+  "name": "microsoft-agents",
+  "description": "Microsoft Agent Framework for building AI agents with Python SDK.",
+  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+}

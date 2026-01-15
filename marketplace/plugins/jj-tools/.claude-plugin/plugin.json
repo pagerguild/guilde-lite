@@ -1,0 +1,5 @@
+{
+  "name": "jj-tools",
+  "description": "Jujutsu (jj) version control commands and workflow guidance.",
+  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+}
