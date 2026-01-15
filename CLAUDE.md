@@ -1,101 +1,174 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## Project State (Read First)
 
-## Build Commands
+**Active Track:** MULTI-001 - Multi-Agent Workflow Architecture
+**Priority:** P0 (Critical Path)
+**Phase:** 1 - Foundation (COMPLETE - awaiting checkpoint commit)
+**Status:** 10/10 tasks complete
+
+**Next Task:** Git commit checkpoint, then begin Phase 2 - Agent Definitions
+
+```
+Quick Status:
+  conductor/tracks.md        → Master track list
+  conductor/tracks/MULTI-001/plan.md → Current implementation plan
+  conductor/workflow.md      → Task execution protocol
+```
+
+---
+
+## Contents
+
+1. [Project State](#project-state-read-first)
+2. [Critical Rules](#critical-rules)
+3. [Quick Commands](#quick-commands)
+4. [Architecture Overview](#architecture-overview)
+5. [Detailed Documentation](#detailed-documentation)
+
+---
+
+## Critical Rules
+
+### Workflow Discipline
+1. **Read Plan First** - Check `conductor/tracks/MULTI-001/plan.md` before any work
+2. **TDD Required** - Write tests BEFORE implementation (RED → GREEN → REFACTOR)
+3. **Update Plan** - Mark tasks `[~]` when starting, `[x]` when complete
+4. **Sync Docs** - Keep documentation in sync with code changes
+
+### Confirmation Required
+- **NEVER guess** - If requirements are unclear, ASK FIRST
+- **Confirm Phases** - AWAIT explicit user "yes" before marking phase complete
+- Architectural decisions with multiple valid approaches
+- Any destructive operation (delete, force push, drop)
+- Database schema or API contract changes
+
+### Multi-Agent Consensus
+For high-impact decisions, use consensus patterns:
+- Launch parallel subagents for diverse perspectives
+- Use LLM Council pattern for architecture decisions
+- See `docs/MULTI-AGENT-CONSENSUS-PATTERNS.md` for details
+
+---
+
+## Quick Commands
 
 ```bash
+# Development
 task              # List all available commands
 task setup        # Full environment bootstrap
 task verify       # Verify all tools installed correctly
-task lint         # Run all linters (Go, Python, TypeScript)
+task lint         # Run all linters
 task test         # Run all tests
 task ci:local     # Run full CI pipeline locally
-```
 
-### Database Management
-```bash
-task db:up        # Start PostgreSQL, Redis, MongoDB, Qdrant, ChromaDB
+# Database
+task db:up        # Start all databases
 task db:down      # Stop all databases
-task db:psql      # Connect to PostgreSQL
-task db:redis     # Connect to Redis CLI
 ```
 
-### Language-Specific Commands
+<details>
+<summary>Language-Specific Commands</summary>
+
 ```bash
 # Go
 go test -v ./...
 go vet ./...
 
 # Python (via uv)
-uv sync           # Install dependencies
-uv run pytest     # Run tests
-uv run ruff check # Lint
+uv sync && uv run pytest
 
 # TypeScript/Bun
-bun install       # Install dependencies
-bun test          # Run tests
-bun run lint      # Lint
+bun install && bun test
+```
+</details>
+
+---
+
+## Architecture Overview
+
+Development environment automation ("Infrastructure as Code" for local machines).
+
+```
+Key Files:
+  Brewfile          # System dependencies (Homebrew)
+  mise.toml         # Runtime versions (Go, Python, Rust, Bun)
+  Taskfile.yml      # Task automation
+
+Directories:
+  conductor/        # Workflow orchestration (tracks, plans, specs)
+  docs/             # Architecture documentation
+  .claude/          # Claude Code configuration (hooks, skills, agents)
+  sandbox/          # AI agent isolation configs
+  docker/           # Database stack (PostgreSQL, Redis, Qdrant)
 ```
 
-## Architecture
-
-This is a development environment automation repository ("Infrastructure as Code" for local machines).
-
-```
-Brewfile          # System dependencies (Homebrew manifest)
-mise.toml         # Runtime versions (Go, Python, Rust, Bun, etc.)
-Taskfile.yml      # Automation engine (Make replacement)
-install.sh        # One-command bootstrap script
-
-config/
-├── ghostty.conf  # GPU-accelerated terminal settings
-└── tmux.conf     # Session multiplexer with Vim integration
-
-sandbox/          # AI agent isolation configurations
-├── basic.sb      # macOS sandbox-exec profile
-├── claude-settings.json  # Claude Code permission restrictions
-└── Dockerfile.agent      # Container-based isolation
-
-docker/
-├── docker-compose.yml    # Database stack definition
-└── init/postgres/        # PostgreSQL initialization (pgvector)
-
-ci/
-├── runner-local.sh       # Self-hosted GitHub runner (macOS)
-└── runner-aws.yaml       # SkyPilot ephemeral runner (AWS)
-
-.github/workflows/
-└── ci.yml                # Multi-language CI pipeline
-```
-
-## Project Conventions
-
-### Tool Preferences (Native Drop-in Replacements)
-- **mise** over nvm/pyenv/goenv - Universal runtime manager
-- **bun** over npm/yarn - Faster JS runtime and package manager
-- **uv** over pip - 10-100x faster Python package management
+### Tool Preferences
+- **mise** over nvm/pyenv - Universal runtime manager
+- **bun** over npm/yarn - Faster JS runtime
+- **uv** over pip - 10-100x faster Python packages
 - **OrbStack** over Docker Desktop - Lighter, faster on Apple Silicon
-- **Task** over Make - Go-based, cross-platform task runner
+- **Task** over Make - Go-based task runner
 
-### Security: AI Agent Sandboxing
-This repo includes three isolation levels for running AI agents:
-1. **Basic** (`sandbox:basic`) - macOS sandbox-exec file/network restrictions
-2. **Container** (`sandbox:container`) - OrbStack container with dropped capabilities
-3. **VM** (`sandbox:vm`) - Full OrbStack Linux VM isolation
+---
 
-When modifying sandbox configs, be conservative—block dangerous operations by default.
+## Detailed Documentation
 
-### Blocked Operations
-The `sandbox/claude-settings.json` blocks:
-- Destructive commands (`rm -rf /`, `mkfs`, etc.)
-- Force pushes to main/master
-- Package publishing without explicit approval
-- System modification commands
+| Document | Purpose |
+|----------|---------|
+| [Multi-Agent Workflow](docs/MULTI-AGENT-WORKFLOW.md) | Full architecture spec |
+| [Consensus Patterns](docs/MULTI-AGENT-CONSENSUS-PATTERNS.md) | How agents reach agreement |
+| [Workflow Protocol](conductor/workflow.md) | Task execution steps |
+| [Track Plan](conductor/tracks/MULTI-001/plan.md) | Current implementation tasks |
+| [Track Spec](conductor/tracks/MULTI-001/spec.md) | Requirements & acceptance criteria |
 
-### Database Stack
-All databases run via OrbStack containers (not Docker Desktop):
-- PostgreSQL 16 with **pgvector** extension for embeddings
-- Redis Stack with **RediSearch** for vector similarity
-- Qdrant for dedicated vector search
-- ChromaDB for LLM embedding storage
+---
+
+## Session Startup Protocol
+
+When starting a new session:
+
+1. **Check Active Track**
+   ```bash
+   cat conductor/tracks.md | head -20
+   ```
+
+2. **Find Next Task**
+   ```bash
+   grep -A 5 "^\- \[ \]" conductor/tracks/MULTI-001/plan.md | head -10
+   ```
+
+3. **Review Recent Changes**
+   ```bash
+   git log --oneline -5
+   git status
+   ```
+
+4. **Load Context** (if resuming complex work)
+   ```bash
+   cat SESSION_HANDOFF.md 2>/dev/null || echo "No handoff file"
+   ```
+
+---
+
+## Memory Hierarchy
+
+Context is loaded in this priority order:
+
+1. **CLAUDE.md** (this file) - Project rules and state
+2. **conductor/tracks.md** - Active work summary
+3. **conductor/tracks/*/plan.md** - Current task details
+4. **SESSION_HANDOFF.md** - Session-specific context (if present)
+5. **.claude/rules/*.md** - Modular instruction sets
+
+### Token Optimization
+- Use subagents for exploration (isolates context)
+- Compact with `/compact focus on {topic}` at logical breakpoints
+- Summarize findings, don't dump raw output
+
+---
+
+## Import Context
+
+@conductor/tracks.md
+@conductor/workflow.md

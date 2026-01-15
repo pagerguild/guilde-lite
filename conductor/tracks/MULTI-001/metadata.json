@@ -1,0 +1,47 @@
+{
+  "id": "MULTI-001",
+  "title": "Multi-Agent Workflow Architecture",
+  "priority": "P0",
+  "status": "active",
+  "phase": 1,
+  "created": "2026-01-14",
+  "updated": "2026-01-14",
+  "owner": "conductor",
+  "tags": ["architecture", "multi-agent", "workflow", "foundation"],
+  "dependencies": [],
+  "progress": {
+    "total_tasks": 10,
+    "completed": 10,
+    "in_progress": 0,
+    "blocked": 0
+  },
+  "milestones": {
+    "phase_1_foundation": {
+      "status": "complete",
+      "target": "2026-01-15",
+      "tasks_completed": 10,
+      "tasks_total": 10
+    },
+    "phase_2_agents": {
+      "status": "pending",
+      "target": null,
+      "tasks_completed": 0,
+      "tasks_total": 4
+    }
+  },
+  "context": {
+    "primary_docs": [
+      "docs/MULTI-AGENT-WORKFLOW.md",
+      "docs/JJ-MULTI-AGENT-PATTERNS.md"
+    ],
+    "conductor_files": [
+      "conductor/workflow.md",
+      "conductor/product.md",
+      "conductor/tech-stack.md"
+    ],
+    "config_files": [
+      ".claude/settings.json",
+      ".claude/context.md"
+    ]
+  }
+}
