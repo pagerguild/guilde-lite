@@ -4,6 +4,11 @@
 #
 # Usage: docker compose -f docker/observability-compose.yml up -d
 # Quick start: docker compose -f docker/observability-compose.yml --profile quick up -d
+#
+# Environment Variables:
+#   GRAFANA_ADMIN_USER     - Grafana admin username (default: admin)
+#   GRAFANA_ADMIN_PASSWORD - Grafana admin password (default: admin)
+#   GRAFANA_ANON_ENABLED   - Enable anonymous access (default: false)
 
 services:
   # ===========================================================================
@@ -11,7 +16,7 @@ services:
   # Replaces legacy Grafana Agent, 100% OTLP compatible
   # ===========================================================================
   alloy:
-    image: grafana/alloy:latest
+    image: grafana/alloy:v1.3.1
     container_name: otel-alloy
     restart: unless-stopped
     command:
@@ -42,7 +47,7 @@ services:
   # Grafana Loki - Log Aggregation
   # ===========================================================================
   loki:
-    image: grafana/loki:latest
+    image: grafana/loki:3.2.1
     container_name: otel-loki
     restart: unless-stopped
     command: -config.file=/etc/loki/local-config.yaml
@@ -65,7 +70,7 @@ services:
   # Grafana Tempo - Distributed Tracing
   # ===========================================================================
   tempo:
-    image: grafana/tempo:latest
+    image: grafana/tempo:2.6.1
     container_name: otel-tempo
     restart: unless-stopped
     command: -config.file=/etc/tempo/tempo.yaml
@@ -89,7 +94,7 @@ services:
   # Grafana Mimir - Metrics Storage (Prometheus-compatible)
   # ===========================================================================
   mimir:
-    image: grafana/mimir:latest
+    image: grafana/mimir:2.14.1
     container_name: otel-mimir
     restart: unless-stopped
     command:
@@ -114,15 +119,15 @@ services:
   # Grafana - Visualization Dashboard
   # ===========================================================================
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:11.3.0
     container_name: otel-grafana
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
-      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_AUTH_ANONYMOUS_ENABLED: ${GRAFANA_ANON_ENABLED:-false}
       GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
       GF_FEATURE_TOGGLES_ENABLE: traceqlEditor tempoSearch tempoBackendSearch
     volumes:
@@ -148,7 +153,7 @@ services:
   # Use --profile quick for simplified setup
   # ===========================================================================
   otel-lgtm:
-    image: grafana/otel-lgtm:latest
+    image: grafana/otel-lgtm:0.8.1
     container_name: otel-lgtm-quick
     profiles: ["quick"]
     restart: unless-stopped
@@ -180,5 +185,7 @@ volumes:
 
 networks:
   default:
-    name: dev-network
-    external: true
+    name: observability-network
+    # Create a dedicated network for observability stack
+    # To connect to other compose projects, use:
+    #   docker network connect observability-network <container>

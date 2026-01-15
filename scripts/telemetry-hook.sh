@@ -34,6 +34,34 @@ OTEL_ENDPOINT="${OTEL_EXPORTER_OTLP_ENDPOINT:-http://localhost:4317}"
 DEBUG="${GUILDE_TELEMETRY_DEBUG:-false}"
 
 mkdir -p "$STATE_DIR" "$HISTORY_DIR"
+LOCK_FILE="$STATE_DIR/.lock"
+ERROR_LOG="$STATE_DIR/errors.log"
+
+# Atomic write - prevents race conditions with temp file + mv
+atomic_write() {
+    local file="$1"
+    local content="$2"
+    local tmp_file="${file}.tmp.$$"
+    echo "$content" > "$tmp_file" && mv "$tmp_file" "$file"
+}
+
+# Safe JSON update with file locking
+safe_json_update() {
+    local jq_filter="$1"
+    shift
+    local jq_args=("$@")
+
+    (
+        flock -x 200 2>/dev/null || true  # Graceful fallback if flock unavailable
+        if [[ -f "$SESSION_FILE" ]]; then
+            local updated
+            updated=$(jq "${jq_args[@]}" "$jq_filter" "$SESSION_FILE" 2>>"$ERROR_LOG")
+            if [[ -n "$updated" ]]; then
+                atomic_write "$SESSION_FILE" "$updated"
+            fi
+        fi
+    ) 200>"$LOCK_FILE"
+}
 
 # Debug logging
 debug_log() {
@@ -107,14 +135,17 @@ session_end() {
     start_time=$(jq -r '.start_time' "$SESSION_FILE")
     duration=$((end_time - start_time))
 
-    # Update session with end time
-    local updated
-    updated=$(jq \
-        --arg end "$end_time" \
-        --arg dur "$duration" \
-        '. + {end_time: ($end | tonumber), duration_ms: ($dur | tonumber)}' \
-        "$SESSION_FILE")
-    echo "$updated" > "$SESSION_FILE"
+    # Update session with end time (atomic)
+    (
+        flock -x 200 2>/dev/null || true
+        local updated
+        updated=$(jq \
+            --arg end "$end_time" \
+            --arg dur "$duration" \
+            '. + {end_time: ($end | tonumber), duration_ms: ($dur | tonumber)}' \
+            "$SESSION_FILE")
+        atomic_write "$SESSION_FILE" "$updated"
+    ) 200>"$LOCK_FILE"
 
     # Emit final metrics
     emit_metrics
@@ -147,17 +178,15 @@ pre_tool() {
     tool_name=$(echo "$tool_data" | jq -r '.tool_name // "unknown"' 2>/dev/null || echo "unknown")
     timestamp=$(timestamp_ms)
 
-    # Record tool start in timeline
-    local updated
-    updated=$(jq \
-        --arg tool "$tool_name" \
-        --arg ts "$timestamp" \
+    # Record tool start in timeline (atomic)
+    safe_json_update \
         '.timeline += [{
             event: "tool_start",
             tool: $tool,
             timestamp: ($ts | tonumber)
-        }]' "$SESSION_FILE")
-    echo "$updated" > "$SESSION_FILE"
+        }]' \
+        --arg tool "$tool_name" \
+        --arg ts "$timestamp"
 
     debug_log "Tool started: $tool_name"
 }
@@ -176,12 +205,8 @@ post_tool() {
     status=$(echo "$tool_data" | jq -r '.status // "success"' 2>/dev/null || echo "success")
     timestamp=$(timestamp_ms)
 
-    # Update metrics
-    local updated
-    updated=$(jq \
-        --arg tool "$tool_name" \
-        --arg status "$status" \
-        --arg ts "$timestamp" \
+    # Update metrics (atomic)
+    safe_json_update \
         '
         .metrics.total_tool_calls += 1 |
         .metrics.tool_calls[$tool] = ((.metrics.tool_calls[$tool] // 0) + 1) |
@@ -192,17 +217,16 @@ post_tool() {
             status: $status,
             timestamp: ($ts | tonumber)
         }]
-        ' "$SESSION_FILE")
-    echo "$updated" > "$SESSION_FILE"
+        ' \
+        --arg tool "$tool_name" \
+        --arg status "$status" \
+        --arg ts "$timestamp"
 
     # Check if this was a Task tool (agent spawn)
     if [[ "$tool_name" == "Task" ]]; then
         local subagent_type
         subagent_type=$(echo "$tool_data" | jq -r '.subagent_type // "unknown"' 2>/dev/null || echo "unknown")
-        updated=$(jq \
-            --arg agent "$subagent_type" \
-            '.metrics.agents_spawned += [$agent]' "$SESSION_FILE")
-        echo "$updated" > "$SESSION_FILE"
+        safe_json_update '.metrics.agents_spawned += [$agent]' --arg agent "$subagent_type"
     fi
 
     debug_log "Tool completed: $tool_name ($status)"
@@ -218,9 +242,8 @@ pre_compact() {
     local timestamp
     timestamp=$(timestamp_ms)
 
-    local updated
-    updated=$(jq \
-        --arg ts "$timestamp" \
+    # Update compaction count (atomic)
+    safe_json_update \
         '
         .metrics.compaction_count += 1 |
         .timeline += [{
@@ -228,13 +251,13 @@ pre_compact() {
             count: .metrics.compaction_count,
             timestamp: ($ts | tonumber)
         }]
-        ' "$SESSION_FILE")
-    echo "$updated" > "$SESSION_FILE"
+        ' \
+        --arg ts "$timestamp"
 
     # Emit compaction metric immediately
-    emit_metric "claude_agent_context_compaction_total" "counter" "1"
+    emit_metric "claude_context_compaction_total" "1" "session_id=$(jq -r '.session_id // \"unknown\"' "$SESSION_FILE" 2>/dev/null)"
 
-    debug_log "Context compacted (count: $(jq '.metrics.compaction_count' "$SESSION_FILE"))"
+    debug_log "Context compacted (count: $(jq '.metrics.compaction_count' "$SESSION_FILE" 2>/dev/null))"
 }
 
 # Track skill/command invocation
@@ -248,10 +271,8 @@ track_skill() {
     local timestamp
     timestamp=$(timestamp_ms)
 
-    local updated
-    updated=$(jq \
-        --arg skill "$skill_name" \
-        --arg ts "$timestamp" \
+    # Update skills (atomic)
+    safe_json_update \
         '
         .metrics.skills_invoked += [$skill] |
         .timeline += [{
@@ -259,34 +280,122 @@ track_skill() {
             skill: $skill,
             timestamp: ($ts | tonumber)
         }]
-        ' "$SESSION_FILE")
-    echo "$updated" > "$SESSION_FILE"
+        ' \
+        --arg skill "$skill_name" \
+        --arg ts "$timestamp"
 
     debug_log "Skill invoked: $skill_name"
 }
 
-# Emit a single metric to OTEL (via HTTP for simplicity)
-emit_metric() {
-    local name="$1"
-    local type="$2"
-    local value="$3"
-    local labels="${4:-}"
-
-    # Use HTTP endpoint (4318) for simplicity
+# Get HTTP endpoint from gRPC endpoint
+get_http_endpoint() {
     local http_endpoint="${OTEL_ENDPOINT%:4317}:4318"
-
-    if ! curl -s --connect-timeout 1 "$http_endpoint/v1/metrics" > /dev/null 2>&1; then
-        debug_log "OTEL endpoint not available, metric not sent: $name"
-        return 0
+    # Handle case where endpoint already uses HTTP port
+    if [[ "$OTEL_ENDPOINT" == *":4318"* ]]; then
+        http_endpoint="$OTEL_ENDPOINT"
     fi
-
-    debug_log "Emitting metric: $name=$value"
+    echo "$http_endpoint"
 }
 
-# Emit event to OTEL
+# Emit a single metric to OTEL (via OTLP/HTTP)
+emit_metric() {
+    local name="$1"
+    local value="$2"
+    local labels="${3:-}"
+
+    local http_endpoint
+    http_endpoint=$(get_http_endpoint)
+    local timestamp_ns
+    timestamp_ns=$(( $(timestamp_ms) * 1000000 ))
+
+    # Build OTLP metric JSON payload
+    local payload
+    payload=$(jq -n \
+        --arg name "$name" \
+        --arg value "$value" \
+        --argjson ts "$timestamp_ns" \
+        --arg svc "${OTEL_SERVICE_NAME:-claude-code}" \
+        '{
+            resourceMetrics: [{
+                resource: {
+                    attributes: [{
+                        key: "service.name",
+                        value: { stringValue: $svc }
+                    }]
+                },
+                scopeMetrics: [{
+                    scope: { name: "guilde-telemetry" },
+                    metrics: [{
+                        name: $name,
+                        sum: {
+                            dataPoints: [{
+                                asInt: ($value | tonumber),
+                                timeUnixNano: $ts,
+                                startTimeUnixNano: $ts
+                            }],
+                            aggregationTemporality: 2,
+                            isMonotonic: true
+                        }
+                    }]
+                }]
+            }]
+        }')
+
+    # Send to OTEL collector (non-blocking, fire-and-forget)
+    curl -s --connect-timeout 1 --max-time 2 \
+        -X POST "$http_endpoint/v1/metrics" \
+        -H "Content-Type: application/json" \
+        -d "$payload" > /dev/null 2>&1 &
+
+    debug_log "Emitting metric: $name=$value to $http_endpoint"
+}
+
+# Emit event/log to OTEL
 emit_event() {
     local event_name="$1"
     local event_data="$2"
+
+    local http_endpoint
+    http_endpoint=$(get_http_endpoint)
+    local timestamp_ns
+    timestamp_ns=$(( $(timestamp_ms) * 1000000 ))
+
+    # Build OTLP log payload
+    local payload
+    payload=$(jq -n \
+        --arg name "$event_name" \
+        --arg body "$event_data" \
+        --argjson ts "$timestamp_ns" \
+        --arg svc "${OTEL_SERVICE_NAME:-claude-code}" \
+        '{
+            resourceLogs: [{
+                resource: {
+                    attributes: [{
+                        key: "service.name",
+                        value: { stringValue: $svc }
+                    }]
+                },
+                scopeLogs: [{
+                    scope: { name: "guilde-telemetry" },
+                    logRecords: [{
+                        timeUnixNano: $ts,
+                        severityNumber: 9,
+                        severityText: "INFO",
+                        body: { stringValue: $body },
+                        attributes: [{
+                            key: "event.name",
+                            value: { stringValue: $name }
+                        }]
+                    }]
+                }]
+            }]
+        }')
+
+    # Send to OTEL collector (non-blocking, fire-and-forget)
+    curl -s --connect-timeout 1 --max-time 2 \
+        -X POST "$http_endpoint/v1/logs" \
+        -H "Content-Type: application/json" \
+        -d "$payload" > /dev/null 2>&1 &
 
     debug_log "Event: $event_name - $event_data"
 }

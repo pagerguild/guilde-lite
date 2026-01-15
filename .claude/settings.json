@@ -43,7 +43,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/telemetry-hook.sh session-start 2>/dev/null || echo 'Telemetry session start skipped'"
+            "command": "bash scripts/telemetry-hook.sh session-start 2>>~/.local/share/guilde-telemetry/errors.log || echo 'Telemetry session start skipped'"
           },
           {
             "type": "command",
@@ -75,7 +75,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/telemetry-hook.sh pre-compact 2>/dev/null || true"
+            "command": "bash scripts/telemetry-hook.sh pre-compact 2>>~/.local/share/guilde-telemetry/errors.log || true"
           },
           {
             "type": "command",
@@ -93,7 +93,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'bash scripts/telemetry-hook.sh post-tool \"{\\\"tool_name\\\":\\\"$CLAUDE_TOOL_NAME\\\",\\\"status\\\":\\\"success\\\"}\" 2>/dev/null' || true"
+            "command": "bash -c 'bash scripts/telemetry-hook.sh post-tool \"{\\\"tool_name\\\":\\\"$CLAUDE_TOOL_NAME\\\",\\\"status\\\":\\\"success\\\"}\" 2>>~/.local/share/guilde-telemetry/errors.log' || true"
           }
         ]
       },
@@ -147,7 +147,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/telemetry-hook.sh session-end 2>/dev/null || true"
+            "command": "bash scripts/telemetry-hook.sh session-end 2>>~/.local/share/guilde-telemetry/errors.log || true"
           }
         ]
       }

@@ -7,14 +7,10 @@ server:
   grpc_listen_port: 9095
   log_level: info
 
+# NOTE: OTLP receivers are handled by Alloy collector, not Tempo directly
+# Tempo receives traces via remote_write from Alloy
 distributor:
-  receivers:
-    otlp:
-      protocols:
-        grpc:
-          endpoint: 0.0.0.0:4317
-        http:
-          endpoint: 0.0.0.0:4318
+  receivers: {}
 
 ingester:
   max_block_duration: 5m
