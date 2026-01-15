@@ -10,6 +10,10 @@
           {
             "type": "command",
             "command": "bash scripts/session-startup.sh 2>/dev/null || cat conductor/tracks.md 2>/dev/null | head -20 || echo 'No active tracks'"
+          },
+          {
+            "type": "command",
+            "command": "bash scripts/preserve-context.sh --status 2>/dev/null || echo 'Context status unavailable'"
           }
         ]
       }
@@ -20,6 +24,20 @@
           {
             "type": "prompt",
             "prompt": "MULTI-AGENT WORKFLOW ENFORCEMENT: Before responding, consider if this task requires parallel subagents. For research tasks, use Explore agents. For code changes, plan to invoke code-reviewer and test-automator agents. For validation, launch multiple validators in parallel. Skip multi-agent only for trivial tasks (single file reads, direct questions with known answers). See .claude/rules/multi-agent-workflow.md for requirements."
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/preserve-context.sh --save 2>/dev/null || echo 'Context preservation skipped'"
+          },
+          {
+            "type": "prompt",
+            "prompt": "CONTEXT PRESERVATION: Before compaction, ensure you have updated .claude/SESSION_HANDOFF.md with: 1) Current task status, 2) Key decisions made, 3) Files modified, 4) Next steps for resumption. This ensures continuity across sessions."
           }
         ]
       }
