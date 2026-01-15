@@ -1,5 +1,16 @@
 {
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "MISE-FIRST ENFORCEMENT: Before running this command, check if it violates mise-first patterns:\n\n1. BLOCK: pip install → Use 'uv pip install' or 'uvx' instead\n2. BLOCK: npm install (for global tools) → Use 'mise use npm:<pkg>@latest' or 'bun add'\n3. WARN: brew install <runtime> → Use 'mise use <runtime>@latest' for node/python/go/rust\n4. WARN: nvm/pyenv/rbenv commands → Migrate to mise\n\nIf the command violates these patterns, suggest the mise-first alternative. Only proceed if user confirms or command is compliant."
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "hooks": [

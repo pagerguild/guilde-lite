@@ -103,23 +103,36 @@ Directories:
   docker/           # Database stack (PostgreSQL, Redis, Qdrant)
 ```
 
-### Tool Preferences
-- **mise** over nvm/pyenv - Universal runtime manager
-- **bun** over npm/yarn - Faster JS runtime
-- **uv** over pip - 10-100x faster Python packages
-- **OrbStack** over Docker Desktop - Lighter, faster on Apple Silicon
-- **Task** over Make - Go-based task runner
+### Tool Preferences (Mise-First)
 
-### Installation Priority Order
-When installing tools, follow this priority (highest to lowest):
-1. **curl/wget** - Direct installers (e.g., Claude Code)
-2. **mise** - Universal runtime manager (preferred for most tools)
-3. **uv/uvx** - Python tools (ALWAYS prefer over pip)
-4. **bun** - JS/TS tools (prefer over npm)
-5. **npm** - JS tools when bun unavailable
-6. **homebrew** - System tools only when above unavailable
+**ENFORCED via hooks** - See `.claude/rules/mise-first-enforcement.md`
 
-**Python Package Rule:** NEVER use `pip install`. ALWAYS use `uv pip install` or `uvx` for running Python tools.
+| Instead of | Use | Why |
+|------------|-----|-----|
+| nvm/pyenv/rbenv | **mise** | Single tool, faster startup |
+| pip install | **uv pip** or **uvx** | 10-100x faster |
+| npm/yarn | **bun** | Faster, compatible |
+| Docker Desktop | **OrbStack** | Lighter on Apple Silicon |
+| Make | **Task** | Go-based, readable YAML |
+
+### Installation Priority Order (ENFORCED)
+
+```
+Priority  Method      Use For              Example
+───────────────────────────────────────────────────────────────
+1         curl/wget   Direct installers    curl -fsSL url | bash
+2         mise        Languages, CLI tools mise use node@latest
+3         uv/uvx      Python tools         uvx ruff check
+4         bun         JS/TS packages       bun add typescript
+5         npm         When bun unavailable npm install
+6         Homebrew    System tools only    brew install git
+```
+
+**Python Package Rule:** NEVER use `pip install`. ALWAYS use `uv pip install` or `uvx`.
+
+**Mise Configuration Pattern:**
+- Global (`~/.config/mise/config.toml`): All tools = `"latest"`
+- Project (`./mise.toml`): Override only when pinning specific version
 
 ---
 
@@ -132,6 +145,8 @@ When installing tools, follow this priority (highest to lowest):
 | [Workflow Protocol](conductor/workflow.md) | Task execution steps |
 | [Track Plan](conductor/tracks/MULTI-001/plan.md) | Current implementation tasks |
 | [Track Spec](conductor/tracks/MULTI-001/spec.md) | Requirements & acceptance criteria |
+| [Global AI Tools](docs/GLOBAL-AI-TOOLS.md) | Mise global tools setup |
+| [Mise-First Rules](.claude/rules/mise-first-enforcement.md) | Hookify enforcement patterns |
 
 ---
 
