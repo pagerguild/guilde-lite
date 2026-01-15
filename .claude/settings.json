@@ -5,6 +5,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash scripts/claude-health-check.sh 2>/dev/null || echo 'Health check skipped'"
+          },
+          {
+            "type": "command",
             "command": "bash scripts/session-startup.sh 2>/dev/null || cat conductor/tracks.md 2>/dev/null | head -20 || echo 'No active tracks'"
           }
         ]
