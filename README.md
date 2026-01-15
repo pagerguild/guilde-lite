@@ -93,15 +93,27 @@ task help:stages
 
 ## Multi-Agent Workflow System
 
-Guilde Lite includes a comprehensive multi-agent orchestration system for AI-assisted development.
+Guilde Lite includes a comprehensive multi-agent orchestration system for AI-assisted development, packaged as a Claude Code plugin.
+
+### Loading the Plugin
+
+```bash
+# Start Claude Code with the guilde-workflows plugin
+claude --plugin-dir .
+
+# Or add an alias to ~/.zshrc for convenience
+alias claude-guilde='claude --plugin-dir /path/to/guilde-lite'
+```
 
 ### Quick Start
 
+Once the plugin is loaded, use these commands:
+
 ```bash
-/conductor-status          # View current track and progress
-/conductor-new-track       # Start a new implementation track
-/conductor-implement       # Work on current phase with TDD
-/conductor-checkpoint      # Mark phase complete
+/guilde-workflows:conductor-status      # View current track and progress
+/guilde-workflows:conductor-new-track   # Start a new implementation track
+/guilde-workflows:conductor-implement   # Work on current phase with TDD
+/guilde-workflows:conductor-checkpoint  # Mark phase complete
 ```
 
 ### Key Features

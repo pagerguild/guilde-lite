@@ -55,3 +55,4 @@ uv.lock
 
 # Claude Code session artifacts
 *-command-message*.txt
+.claude/context/
