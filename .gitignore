@@ -48,3 +48,10 @@ logs/
 # IDE/Tool specific
 .task/
 .mise.toml.local
+
+# Python
+.venv/
+uv.lock
+
+# Claude Code session artifacts
+*-command-message*.txt

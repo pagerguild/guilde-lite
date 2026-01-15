@@ -253,6 +253,23 @@ orb restart
 task db:reset  # Warning: destroys data
 ```
 
+### Claude Code Plugin Issues
+
+If plugins fail to load or `/doctor` reports errors:
+
+```bash
+# Check plugin structure
+ls -la ~/.claude/plugins/cache/<marketplace>/<plugin>/
+
+# View debug logs
+tail -100 ~/.claude/debug/*.txt | grep "<plugin-name>"
+```
+
+**Known Issues**:
+- **business-analytics plugin**: Upstream missing required files. See [PLUGIN-FIX-SUMMARY.md](docs/PLUGIN-FIX-SUMMARY.md) for fix.
+
+For detailed plugin troubleshooting, see [docs/PLUGIN-FIX-BUSINESS-ANALYTICS.md](docs/PLUGIN-FIX-BUSINESS-ANALYTICS.md).
+
 ## Contributing
 
 1. Fork the repository
