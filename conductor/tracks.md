@@ -6,11 +6,33 @@
 
 | Track ID | Title | Status | Priority | Phase |
 |----------|-------|--------|----------|-------|
-| - | No active tracks | - | - | - |
+| MARKETPLACE-001 | Plugin Marketplace Creation | In Progress | P1 | 1 |
 
 ## Track Details
 
-*No tracks currently in progress.*
+### [~] MARKETPLACE-001: Plugin Marketplace Creation
+
+**Priority:** P1
+**Type:** Enhancement
+**Created:** 2026-01-15
+**Status:** Phase 1 - Repository Setup
+
+**Summary:** Create a public plugin marketplace repository (pagerguild/guilde-plugins) following Claude Code marketplace best practices. Modularize guilde-lite's components into granular, single-purpose plugins.
+
+**Progress:** 0/37 tasks (0%)
+
+**Phases:**
+1. Repository Setup (0/4)
+2. Conductor Plugin (0/5)
+3. TDD Plugin (0/5)
+4. Review Agents Plugin (0/4)
+5. Exploration Agents Plugin (0/4)
+6. Implementation Agents Plugin (0/4)
+7. Utility Plugins (0/6)
+8. Validation & Documentation (0/5)
+
+**Spec:** [conductor/tracks/MARKETPLACE-001/spec.md](tracks/MARKETPLACE-001/spec.md)
+**Plan:** [conductor/tracks/MARKETPLACE-001/plan.md](tracks/MARKETPLACE-001/plan.md)
 
 ---
 
