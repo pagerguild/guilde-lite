@@ -917,3 +917,48 @@ tasks:
       - task: config:verify
       - echo ""
       - echo "✓ Full validation complete - all checks passed"
+
+  # ===========================================================================
+  # MISE-FIRST TASKS
+  # ===========================================================================
+  mise:status:
+    desc: "Show mise configuration status"
+    cmds:
+      - bash scripts/validate-mise-first.sh
+
+  mise:validate:
+    desc: "Validate mise-first patterns (CI mode)"
+    cmds:
+      - bash scripts/validate-mise-first.sh --ci
+
+  mise:fix:
+    desc: "Auto-fix mise configuration issues"
+    cmds:
+      - bash scripts/validate-mise-first.sh --fix
+
+  mise:metrics:
+    desc: "Show mise adoption metrics report"
+    cmds:
+      - bash scripts/mise-metrics.sh report
+
+  mise:metrics:json:
+    desc: "Export mise metrics as JSON"
+    cmds:
+      - bash scripts/mise-metrics.sh json
+
+  mise:metrics:reset:
+    desc: "Reset mise metrics (with backup)"
+    cmds:
+      - bash scripts/mise-metrics.sh reset
+
+  mise:doctor:
+    desc: "Run mise diagnostics"
+    cmds:
+      - mise doctor
+      - echo ""
+      - task: mise:status
+
+  mise:global:setup:
+    desc: "Setup global AI CLI tools"
+    cmds:
+      - bash scripts/setup-global-ai-tools.sh

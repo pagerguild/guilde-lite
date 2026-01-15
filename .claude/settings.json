@@ -52,6 +52,17 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'CMD=\"$CLAUDE_TOOL_INPUT\"; if echo \"$CMD\" | grep -qE \"pip install\" && ! echo \"$CMD\" | grep -qE \"uv pip\"; then bash scripts/mise-metrics.sh track pip_violation \"$CMD\" 2>/dev/null; elif echo \"$CMD\" | grep -qE \"npm install -g|npm i -g\"; then bash scripts/mise-metrics.sh track npm_violation \"$CMD\" 2>/dev/null; elif echo \"$CMD\" | grep -qE \"^nvm |^pyenv |^rbenv |^goenv \"; then bash scripts/mise-metrics.sh track legacy_violation \"$CMD\" 2>/dev/null; elif echo \"$CMD\" | grep -qE \"mise install\"; then bash scripts/mise-metrics.sh track mise_install 2>/dev/null; elif echo \"$CMD\" | grep -qE \"mise use\"; then bash scripts/mise-metrics.sh track mise_use 2>/dev/null; elif echo \"$CMD\" | grep -qE \"^uv |^uvx \"; then bash scripts/mise-metrics.sh track uv_usage 2>/dev/null; elif echo \"$CMD\" | grep -qE \"^bun \"; then bash scripts/mise-metrics.sh track bun_usage 2>/dev/null; fi' 2>/dev/null || true"
+          }
+        ]
+      }
     ]
   },
   "enabledPlugins": {
