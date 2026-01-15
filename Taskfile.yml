@@ -276,12 +276,43 @@ tasks:
       - echo "✓ Databases running"
 
   stage:ai-tools:
-    desc: "Stage AI: Install Claude Code and other AI tools"
+    desc: "Stage AI: Install AI coding CLI tools"
+    cmds:
+      - task: stage:ai-tools:install
+      - task: stage:ai-tools:verify
+
+  stage:ai-tools:install:
+    desc: "Install AI coding tools (Claude Code, OpenCode, Codex, Gemini CLI)"
     cmds:
       - echo "=== Installing AI coding tools ==="
-      - npm install -g @anthropic-ai/claude-code || bun install -g @anthropic-ai/claude-code || true
-      - command -v claude && claude --version || echo "Claude Code installation may require restart"
-      - echo "✓ AI tools complete"
+      - 'echo "Priority order: curl → mise → bun → npm → homebrew"'
+      - echo ""
+      - |
+        echo "--- Claude Code (curl installer - npm is deprecated) ---"
+        if command -v claude &>/dev/null; then
+          echo "✓ Claude Code already installed: $(claude --version 2>/dev/null | head -1)"
+        else
+          echo "Installing Claude Code via curl..."
+          curl -fsSL https://claude.ai/install.sh | bash || echo "⚠ Claude Code install failed - try manually"
+        fi
+      - |
+        echo ""
+        echo "--- OpenCode, Codex, Gemini CLI (via mise) ---"
+        mise install opencode || echo "⚠ OpenCode install failed"
+        mise install npm:@openai/codex || echo "⚠ Codex install failed"
+        mise install npm:@google/gemini-cli || echo "⚠ Gemini CLI install failed"
+      - echo ""
+      - echo "✓ AI tools installation complete"
+
+  stage:ai-tools:verify:
+    desc: "Verify AI tools installation"
+    cmds:
+      - echo "=== Verifying AI tools ==="
+      - 'command -v claude && claude --version 2>/dev/null | head -1 || echo "⚠ Claude Code not found"'
+      - 'command -v opencode && opencode --version 2>/dev/null | head -1 || echo "⚠ OpenCode not found"'
+      - 'mise exec -- codex --version 2>/dev/null | head -1 || echo "⚠ Codex not found"'
+      - 'mise exec -- gemini --version 2>/dev/null | head -1 || echo "⚠ Gemini CLI not found"'
+      - echo "✓ AI tools verification complete"
 
   # ===========================================================================
   # FULL SETUP (All stages)

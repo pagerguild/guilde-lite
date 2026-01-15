@@ -36,10 +36,21 @@ uv = "latest"
 # =============================================================================
 # AI CODING TOOLS
 # =============================================================================
-# Note: Claude Code is installed via `task stage:ai-tools` after node/bun
-# This avoids circular dependency (npm packages need node to resolve)
-# Install manually: npm install -g @anthropic-ai/claude-code
-#                   or: bun install -g @anthropic-ai/claude-code
+# Installation priority: curl > mise > bun > npm > homebrew
+#
+# Claude Code - Install via curl (npm is deprecated):
+#   curl -fsSL https://claude.ai/install.sh | bash
+#
+# The following are managed by mise:
+
+# OpenCode - AI coding assistant (mise native plugin)
+opencode = "latest"
+
+# OpenAI Codex - AI coding agent (requires Node 22+)
+"npm:@openai/codex" = "latest"
+
+# Google Gemini CLI - AI assistant (requires Node 20+)
+"npm:@google/gemini-cli" = "latest"
 
 # =============================================================================
 # PYTHON TOOLS (via pipx/uv)
