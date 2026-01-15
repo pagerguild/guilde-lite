@@ -2,6 +2,17 @@
 
 Parallel code review agents for comprehensive quality assurance.
 
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `/multi-agent` | Show multi-agent workflow status and compliance metrics |
+| `/multi-agent status` | Quick compliance status |
+| `/multi-agent report` | Full compliance report |
+| `/multi-agent check` | Check for pending reviews |
+| `/multi-agent clear` | Mark pending reviews as complete |
+| `/multi-agent help` | Show help and documentation links |
+
 ## Agents
 
 | Agent | Model | Focus |

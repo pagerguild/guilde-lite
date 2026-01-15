@@ -247,6 +247,7 @@
     "julia-development@claude-code-workflows": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
-    "vercel@claude-plugins-official": true
+    "vercel@claude-plugins-official": true,
+    "conductor-workflows@guilde-plugins": true
   }
 }
