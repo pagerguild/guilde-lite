@@ -404,13 +404,13 @@ tasks:
     desc: "Initialize claude-flow in the current repo"
     cmds:
       - command -v bun >/dev/null || { echo "bun not installed"; exit 1; }
-      - bunx -y claude-flow@v3alpha init
+      - bunx -y claude-flow@3.0.0-alpha.79 init
 
   claude-flow:install:
     desc: "Install claude-flow globally via bun"
     cmds:
       - command -v bun >/dev/null || { echo "bun not installed"; exit 1; }
-      - bun add -g claude-flow@v3alpha
+      - bun add -g claude-flow@3.0.0-alpha.79
 
   claude-flow:version:
     desc: "Show claude-flow version (global)"
@@ -429,13 +429,13 @@ tasks:
     desc: "Start claude-flow MCP server (bunx)"
     cmds:
       - command -v bun >/dev/null || { echo "bun not installed"; exit 1; }
-      - bunx -y claude-flow@v3alpha mcp start
+      - bunx -y claude-flow@3.0.0-alpha.79 mcp start
 
   claude-flow:run:
     desc: "Run claude-flow with custom args (usage: task claude-flow:run -- <args>)"
     cmds:
       - command -v bun >/dev/null || { echo "bun not installed"; exit 1; }
-      - bunx -y claude-flow@v3alpha {{.CLI_ARGS}}
+      - bunx -y claude-flow@3.0.0-alpha.79 {{.CLI_ARGS}}
 
   # ===========================================================================
   # LEGACY ALIASES (for backwards compatibility)

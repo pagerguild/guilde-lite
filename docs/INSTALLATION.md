@@ -1304,7 +1304,7 @@ task -l
 
 This includes claude-flow wrappers (`claude-flow:*`) for bun-based usage.
 
-Claude Flow (bunx wrapper):
+Claude Flow (bunx wrapper, pinned to `claude-flow@3.0.0-alpha.79`):
 
 ```bash
 task claude-flow:init

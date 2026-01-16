@@ -186,7 +186,7 @@ task claude-flow:mcp:start
 task claude-flow:run -- --help
 ```
 
-Included in `task setup:full` via `task claude-flow:install`.
+Pinned to `claude-flow@3.0.0-alpha.79`. Included in `task setup:full` via `task claude-flow:install`.
 
 ### AI Agent Sandboxing
 
