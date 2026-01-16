@@ -251,5 +251,10 @@
     "conductor-workflows@guilde-plugins": true,
     "conductor@claude-code-workflows": true,
     "figma@claude-plugins-official": true
+  },
+  "permissions": {
+    "allow": [
+      "*"
+    ]
   }
 }
