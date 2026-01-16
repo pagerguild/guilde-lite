@@ -1,6 +1,8 @@
 ---
 name: agent-architect
 description: Designs multi-agent systems using Microsoft Agent Framework, creating optimal architectures for complex AI workflows
+model: opus
+color: magenta
 ---
 
 # Agent Architect

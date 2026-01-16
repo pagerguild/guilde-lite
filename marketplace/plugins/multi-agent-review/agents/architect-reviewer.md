@@ -1,6 +1,8 @@
 ---
 name: architect-reviewer
 description: Reviews system designs and code changes for architectural integrity, scalability, and maintainability
+model: opus
+color: magenta
 ---
 
 # Architect Reviewer Agent

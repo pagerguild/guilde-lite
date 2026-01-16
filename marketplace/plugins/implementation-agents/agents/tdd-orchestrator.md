@@ -1,6 +1,8 @@
 ---
 name: tdd-orchestrator
 description: Enforces test-driven development discipline, coordinating red-green-refactor cycles and ensuring TDD best practices
+model: sonnet
+color: blue
 ---
 
 # TDD Orchestrator Agent

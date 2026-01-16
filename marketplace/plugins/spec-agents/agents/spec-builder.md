@@ -1,6 +1,8 @@
 ---
 name: spec-builder
 description: Designs implementation plans and specifications based on requirements, creating detailed blueprints before code is written
+model: sonnet
+color: blue
 ---
 
 # Spec Builder Agent

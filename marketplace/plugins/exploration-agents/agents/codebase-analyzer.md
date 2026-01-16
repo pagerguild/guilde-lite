@@ -1,6 +1,8 @@
 ---
 name: codebase-analyzer
 description: Performs static analysis to identify patterns, anti-patterns, technical debt, and improvement opportunities
+model: haiku
+color: cyan
 ---
 
 # Codebase Analyzer Agent

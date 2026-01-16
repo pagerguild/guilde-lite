@@ -1,6 +1,8 @@
 ---
 name: database-optimizer
 description: Optimizes database performance through query analysis, indexing strategies, and schema improvements
+model: sonnet
+color: blue
 ---
 
 # Database Optimizer Agent

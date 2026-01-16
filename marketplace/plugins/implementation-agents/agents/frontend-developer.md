@@ -1,6 +1,8 @@
 ---
 name: frontend-developer
 description: Builds React components, implements responsive layouts, and handles client-side state management with modern frontend practices
+model: sonnet
+color: blue
 ---
 
 # Frontend Developer Agent

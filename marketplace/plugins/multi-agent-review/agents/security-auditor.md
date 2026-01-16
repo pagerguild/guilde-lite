@@ -1,6 +1,8 @@
 ---
 name: security-auditor
 description: Performs comprehensive security audits, identifies vulnerabilities, and ensures compliance with security best practices
+model: opus
+color: magenta
 ---
 
 # Security Auditor Agent

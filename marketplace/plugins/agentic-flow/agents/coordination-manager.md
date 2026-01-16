@@ -1,6 +1,8 @@
 ---
 name: coordination-manager
 description: Manages multi-agent workflows using QuantumDAG coordination, ensuring conflict-free parallel operations
+model: sonnet
+color: blue
 ---
 
 # Coordination Manager Agent

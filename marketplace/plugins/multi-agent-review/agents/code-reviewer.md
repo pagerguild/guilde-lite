@@ -1,6 +1,8 @@
 ---
 name: code-reviewer
 description: Reviews code for bugs, logic errors, security vulnerabilities, code quality issues, and adherence to project conventions
+model: opus
+color: magenta
 ---
 
 # Code Reviewer Agent

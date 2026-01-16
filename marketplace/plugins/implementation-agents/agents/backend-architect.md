@@ -1,6 +1,8 @@
 ---
 name: backend-architect
 description: Designs and implements scalable backend architectures including API design, data modeling, and system structure
+model: opus
+color: magenta
 ---
 
 # Backend Architect Agent

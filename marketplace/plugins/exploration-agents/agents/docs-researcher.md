@@ -1,6 +1,8 @@
 ---
 name: docs-researcher
 description: Researches external documentation, APIs, and best practices from web sources and documentation sites
+model: haiku
+color: cyan
 ---
 
 # Docs Researcher Agent

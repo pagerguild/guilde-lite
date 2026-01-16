@@ -1,6 +1,8 @@
 ---
 name: context-explorer
 description: Rapidly explores codebases to gather context before implementation, identifying relevant files, patterns, and dependencies
+model: haiku
+color: cyan
 ---
 
 # Context Explorer Agent

@@ -1,6 +1,8 @@
 ---
 name: observability-expert
 description: Implements observability infrastructure for Microsoft Agent Framework systems including traces, metrics, logs, and dashboards
+model: haiku
+color: cyan
 ---
 
 # Observability Expert

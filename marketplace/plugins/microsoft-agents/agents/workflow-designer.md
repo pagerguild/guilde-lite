@@ -1,6 +1,8 @@
 ---
 name: workflow-designer
 description: Designs and implements multi-agent workflow graphs using Microsoft Agent Framework workflow builders
+model: sonnet
+color: blue
 ---
 
 # Workflow Designer
