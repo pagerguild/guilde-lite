@@ -661,7 +661,7 @@ docker build -t image-name .  # Build image from Dockerfile
 orbctl                        # OrbStack specific commands
 ```
 
-**Configuration Location:** Environment: `DOCKER_HOST = unix://~/.orbstack/run/docker.sock`
+**Configuration Location:** Docker context (recommended) or `DOCKER_HOST` when set locally
 **Official Documentation:** https://orbstack.dev
 
 ---
@@ -917,9 +917,9 @@ cursor --new-window           # Open in new window
 
 ---
 
-### Claude Code (npm package)
+### Claude Code (curl installer)
 
-**Version:** Latest (via mise - npm package)
+**Version:** Latest (curl installer; npm is deprecated)
 **Replaces:** N/A (Anthropic CLI assistant)
 **Why:** Command-line interface to Claude for code generation and analysis
 
@@ -931,8 +931,74 @@ claude                        # Start interactive session
 # Requires ANTHROPIC_API_KEY environment variable
 ```
 
+**Install:** `curl -fsSL https://claude.ai/install.sh | bash`
 **Configuration Location:** `~/.claude/settings.json`, environment variables
 **Official Documentation:** https://docs.anthropic.com/claude-code
+
+---
+
+### OpenAI Codex CLI (npm package)
+
+**Version:** Latest (via mise - npm package)
+**Replaces:** N/A (OpenAI CLI assistant)
+**Why:** Command-line interface to Codex for code generation and analysis
+
+**Common Commands:**
+```bash
+codex --help                  # Show available commands
+codex --version               # Check installed version
+codex                         # Start interactive session
+```
+
+**Configuration Location:** `~/.config/openai/` (varies), environment variables
+**Official Documentation:** https://platform.openai.com/docs
+
+---
+
+### Gemini CLI (npm package)
+
+**Version:** Latest (via mise - npm package)
+**Replaces:** N/A (Google Gemini CLI)
+**Why:** Command-line access to Gemini for prompts and code assistance
+
+**Common Commands:**
+```bash
+gemini --help                 # Show available commands
+gemini --version              # Check installed version
+gemini                         # Start interactive session
+```
+
+**Configuration Location:** `~/.config/gemini/` (varies), environment variables
+**Official Documentation:** https://ai.google.dev
+
+---
+
+### OpenCode (npm package)
+
+**Version:** Latest (via mise)
+**Replaces:** N/A (OpenCode assistant)
+**Why:** CLI assistant for code generation and automation
+
+**Common Commands:**
+```bash
+opencode --help               # Show available commands
+opencode --version            # Check installed version
+opencode                       # Start interactive session
+```
+
+**Configuration Location:** `~/.config/opencode/` (varies), environment variables
+**Official Documentation:** https://github.com/opencode-ai/opencode
+
+---
+
+### AI Tools Verification
+
+```bash
+command -v claude && claude --version
+command -v codex && codex --version
+command -v gemini && gemini --version
+command -v opencode && opencode --version
+```
 
 ---
 
@@ -1107,7 +1173,7 @@ Universal version management via Mise. Configure in `mise.toml` at project root.
 
 ### Go
 
-**Version:** 1.23 (configured in mise.toml)
+**Version:** latest (configured in mise.toml)
 **Replaces:** Manual Go installation
 **Why:** Primary language for orchestration, CLI tools, agents
 
@@ -1149,7 +1215,7 @@ cargo add dependency          # Add dependency
 
 ### Python
 
-**Version:** 3.12 (configured in mise.toml)
+**Version:** latest (configured in mise.toml)
 **Replaces:** Manual Python installation
 **Why:** AI/ML, scripting, data processing
 
@@ -1169,7 +1235,7 @@ uv pip install package        # Install with UV (faster)
 
 ### Node.js
 
-**Version:** lts (configured in mise.toml)
+**Version:** latest (configured in mise.toml)
 **Replaces:** Manual Node installation
 **Why:** Legacy tooling compatibility
 
@@ -1333,7 +1399,7 @@ sky stop job_id                 # Stop job
 
 ## Environment Variables
 
-Set globally in `mise.toml [env]` section:
+Set in `mise.toml [env]` for project-wide defaults. Use local overrides (shell or `mise.local.toml`) for machine-specific settings.
 
 | Variable | Value | Purpose |
 |----------|-------|---------|
@@ -1346,7 +1412,6 @@ Set globally in `mise.toml [env]` section:
 | `VISUAL` | `cursor --wait` | Visual editor (Cursor) |
 | `HOMEBREW_NO_ANALYTICS` | `1` | Disable Homebrew analytics |
 | `HOMEBREW_NO_ENV_HINTS` | `1` | Disable Homebrew environment hints |
-| `DOCKER_HOST` | `unix://~/.orbstack/run/docker.sock` | OrbStack Docker socket |
 | `XDG_CONFIG_HOME` | `~/.config` | Config directory (XDG standard) |
 | `XDG_DATA_HOME` | `~/.local/share` | Data directory (XDG standard) |
 | `XDG_CACHE_HOME` | `~/.cache` | Cache directory (XDG standard) |
@@ -1367,6 +1432,45 @@ brew bundle --file=brew/03-terminal.Brewfile
 
 # Or use a task runner:
 task setup:brew
+```
+
+### Update Everything
+
+```bash
+task update:all
+```
+
+### Tool Status Summary
+
+```bash
+task tools:status
+```
+
+Outputs Homebrew formulae/casks plus mise configured/active versions.
+
+### List Commands
+
+```bash
+task -l
+```
+
+### Global AI Tools
+
+If you want AI CLIs available in any directory, use the global mise config:
+
+```bash
+task mise:global:setup
+```
+
+See `docs/GLOBAL-AI-TOOLS.md` for details.
+
+### Mise-First Maintenance
+
+```bash
+task mise:status   # Check mise-first compliance
+task mise:fix      # Auto-fix common issues
+task mise:metrics  # Report mise adoption metrics
+task mise:doctor   # Run mise diagnostics
 ```
 
 ### Update Tools
@@ -1443,12 +1547,13 @@ eval "$(mise activate)"
 ### Docker/OrbStack Issues
 
 ```bash
-# Verify Docker socket
-echo $DOCKER_HOST
-# Should be: unix://~/.orbstack/run/docker.sock
-
-# Test connection
+# Prefer Docker contexts (recommended)
+docker context ls
+docker context use orbstack
 docker ps
+
+# Or set DOCKER_HOST locally (when OrbStack is installed)
+export DOCKER_HOST=unix://$HOME/.orbstack/run/docker.sock
 ```
 
 ### Python/UV Issues

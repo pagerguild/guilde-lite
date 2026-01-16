@@ -372,6 +372,30 @@ tasks:
       - echo "✓ Full setup complete"
 
   # ===========================================================================
+  # MAINTENANCE
+  # ===========================================================================
+
+  update:all:
+    desc: "Update Homebrew and mise-managed tools"
+    cmds:
+      - echo "=== Updating Homebrew ==="
+      - brew update
+      - brew upgrade
+      - brew upgrade --cask || true
+      - brew cleanup
+      - echo ""
+      - echo "=== Updating mise tools ==="
+      - mise upgrade
+      - mise install
+      - mise reshim
+      - echo "✓ Updates complete"
+
+  tools:status:
+    desc: "Show tool status summary (brew, mise, task, runtimes)"
+    cmds:
+      - bash scripts/tool-status.sh
+
+  # ===========================================================================
   # LEGACY ALIASES (for backwards compatibility)
   # ===========================================================================
   brew:
@@ -1133,7 +1157,7 @@ tasks:
     desc: "Start quick observability stack (all-in-one container)"
     cmds:
       - docker compose -f docker/observability-compose.yml --profile quick up -d otel-lgtm
-      - echo "Quick LGTM stack starting at http://localhost:3000"
+      - 'echo "Quick LGTM stack starting at http://localhost:3000"'
 
   otel:down:
     desc: "Stop observability stack"
@@ -1202,7 +1226,7 @@ tasks:
     cmds:
       - cat .env.telemetry
       - echo ""
-      - echo "Source with: source .env.telemetry"
+      - 'echo "Source with: source .env.telemetry"'
 
   telemetry:validate:
     desc: "Run full telemetry validation suite"

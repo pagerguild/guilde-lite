@@ -15,6 +15,10 @@ By the end of this tutorial, you'll have:
 
 **Time Estimate:** 30-60 minutes (depending on internet speed and chosen installation type)
 
+## Mise-First Policy
+
+This setup prefers mise for runtimes and CLI tools, and uses Homebrew only for system apps (GUI tools, fonts, container runtime). If a tool exists in both, mise is the default; Homebrew is fallback when mise doesn’t support it.
+
 ## Prerequisites
 
 ### Required
@@ -643,7 +647,7 @@ task stage:7
 
 **Time:** ~3 minutes
 
-**Note:** Claude Code is installed separately via npm (see Stage AI below).
+**Note:** CLI AI tools are installed separately via mise (see Stage AI below).
 
 **Verification:**
 ```bash
@@ -769,10 +773,10 @@ task stage:runtimes
 
 | Language | Version | Tools |
 |----------|---------|-------|
-| Go | 1.23 | `go`, `gofmt`, `goimports` |
+| Go | latest | `go`, `gofmt`, `goimports` |
 | Rust | latest | `rustc`, `cargo`, `rustup` |
-| Python | 3.12 | `python`, `pip`, `uv` |
-| Node.js | LTS | `node`, `npm` |
+| Python | latest | `python`, `pip`, `uv` |
+| Node.js | latest | `node`, `npm` |
 | Bun | latest | `bun` (npm alternative) |
 | Deno | latest | `deno` |
 | Terraform | latest | `terraform` |
@@ -782,8 +786,7 @@ task stage:runtimes
 - ruff - Linter + formatter
 - skypilot - Cloud compute orchestration
 
-**Plus Node.js tools:**
-- @anthropic-ai/claude-code - Claude Code CLI
+**AI CLIs:** Installed in Stage AI (Claude via curl; Codex/Gemini/OpenCode via mise)
 
 **Time:** ~10 minutes (downloads and compiles)
 
@@ -812,9 +815,9 @@ uv --version
 ```
 Tool   Version          Config Source
 bun    latest           ~/dev/guilde-lite/mise.toml
-go     1.23             ~/dev/guilde-lite/mise.toml
-node   lts              ~/dev/guilde-lite/mise.toml
-python 3.12             ~/dev/guilde-lite/mise.toml
+go     latest           ~/dev/guilde-lite/mise.toml
+node   latest           ~/dev/guilde-lite/mise.toml
+python latest           ~/dev/guilde-lite/mise.toml
 rust   latest           ~/dev/guilde-lite/mise.toml
 ```
 
@@ -881,7 +884,7 @@ mise reshim
 **Rollback:**
 ```bash
 # Uninstall specific runtime
-mise uninstall go@1.23
+mise uninstall go@<version>
 
 # Uninstall all
 mise prune --all
@@ -1107,16 +1110,30 @@ task stage:ai-tools
 ```
 
 **What gets installed:**
-- @anthropic-ai/claude-code - Claude CLI coding assistant
+- Claude Code - Claude CLI coding assistant (curl installer)
+- npm:@openai/codex - OpenAI Codex CLI
+- npm:@google/gemini-cli - Gemini CLI
+- opencode - OpenCode CLI
 
 **Time:** ~2 minutes
 
 **Note:** Requires Node.js or Bun (installed in Stage R).
 
+**Optional (global install):** Make AI CLIs available in any directory:
+```bash
+task mise:global:setup
+```
+See `docs/GLOBAL-AI-TOOLS.md` for details.
+
 **Verification:**
 ```bash
 command -v claude && claude --version
+command -v codex && codex --version
+command -v gemini && gemini --version
+command -v opencode && opencode --version
 ```
+
+See `docs/TOOLS.md` for the full AI tools reference.
 
 **Post-Installation:**
 
@@ -1142,8 +1159,8 @@ source ~/.zshrc
 **Issue:** `claude: command not found`
 ```bash
 # Solution: Restart terminal
-# Or manually add to PATH:
-export PATH="$HOME/.local/share/mise/installs/npm-@anthropic-ai-claude-code/latest/bin:$PATH"
+# Or re-run the installer:
+curl -fsSL https://claude.ai/install.sh | bash
 ```
 
 ---
@@ -1205,7 +1222,7 @@ Everything including AI and databases (~40 minutes)
 - Stage 6: Cloud/AWS tools
 - Stage 7: AI editors (Cursor)
 - Stage 8: Security tools
-- Stage AI: Claude Code
+- Stage AI: AI CLIs (Claude, Codex, Gemini, OpenCode)
 - Stage D: Database containers
 
 **Use when:**
@@ -1262,6 +1279,26 @@ task stage:N
 
 # Example: If Stage 2 failed
 task stage:2
+```
+
+### 2a. Maintenance Updates
+
+Keep Homebrew and mise tools up to date:
+
+```bash
+task update:all
+```
+
+Get a consolidated tool status summary:
+
+```bash
+task tools:status
+```
+
+List all available project commands:
+
+```bash
+task -l
 ```
 
 ### 3. Configure Shell
@@ -1424,6 +1461,13 @@ claude config
 claude "what is the Taskfile?"
 ```
 
+**Codex/Gemini/OpenCode:**
+```bash
+codex --help
+gemini --help
+opencode --help
+```
+
 **Cursor:**
 ```bash
 # Open Cursor
@@ -1467,8 +1511,8 @@ Use this checklist to confirm everything is working:
 - [ ] `lazydocker` launches
 
 ### Runtimes
-- [ ] `go version` shows 1.23
-- [ ] `python --version` shows 3.12
+- [ ] `go version` works
+- [ ] `python --version` works
 - [ ] `rustc --version` works
 - [ ] `bun --version` works
 - [ ] `uv --version` works
@@ -1686,7 +1730,7 @@ docker context ls
 # Switch to OrbStack context
 docker context use orbstack
 
-# Or set DOCKER_HOST
+# Or set DOCKER_HOST locally
 export DOCKER_HOST=unix://$HOME/.orbstack/run/docker.sock
 ```
 
@@ -1713,11 +1757,11 @@ kill -9 <PID>
 mise doctor
 
 # Reinstall specific runtime
-mise uninstall go@1.23
-mise install go@1.23
+mise uninstall go@<version>
+mise install go@<version>
 
 # Check logs
-mise debug install go@1.23
+mise debug install go@<version>
 ```
 
 **Issue:** Wrong runtime version active
@@ -1749,7 +1793,7 @@ mise which python
 mise reshim
 
 # Add to PATH manually (if needed)
-export PATH="$HOME/.local/share/mise/installs/python/3.12/bin:$PATH"
+export PATH="$HOME/.local/share/mise/installs/python/<version>/bin:$PATH"
 ```
 
 #### Stage D: Databases
@@ -1952,8 +1996,8 @@ Customize the environment:
 **1. Update mise.toml for your languages:**
 ```toml
 [tools]
-go = "1.23"           # Your preferred version
-python = "3.12"
+go = "latest"         # Your preferred version (pin if needed)
+python = "latest"
 ruby = "3.3"          # Add languages you need
 java = "21"
 ```

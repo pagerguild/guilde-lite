@@ -2,6 +2,10 @@
 
 Reproducible, automated development environment for AI/Agent development.
 
+## Mise-First Policy
+
+This setup prefers mise for runtimes and CLI tools, and uses Homebrew only for system apps (GUI tools, fonts, container runtime). If a tool exists in both, mise is the default; Homebrew is fallback when mise doesn’t support it.
+
 ## Quick Start
 
 ```bash
@@ -71,9 +75,9 @@ task help:stages
 
 ### Languages & Runtimes
 
-- **Go 1.24** - Orchestration, CLI tools, agents
+- **Go (latest)** - Orchestration, CLI tools, agents
 - **Rust** - Systems programming, performance-critical code
-- **Python 3.12** - AI/ML, scripting, data processing
+- **Python (latest)** - AI/ML, scripting, data processing
 - **Bun** - JavaScript/TypeScript runtime
 - **Deno** - Secure JS/TS runtime
 
@@ -81,7 +85,10 @@ task help:stages
 
 - **Claude Code** - Anthropic's CLI assistant
 - **Cursor** - AI-native editor
-- Additional tools via mise
+- **Gemini CLI** - Google Gemini CLI
+- **OpenAI Codex** - OpenAI CLI assistant
+- **OpenCode** - OpenCode CLI assistant
+- Global install option: `task mise:global:setup` (see `docs/GLOBAL-AI-TOOLS.md`)
 
 ### Databases (with Vector Extensions)
 
@@ -137,12 +144,24 @@ See [docs/MULTI-AGENT-WORKFLOW.md](docs/MULTI-AGENT-WORKFLOW.md) for full docume
 
 ```bash
 task              # List all commands
+task -l           # List all commands with descriptions
 task setup        # Full environment setup
 task verify       # Verify installation
 task db:up        # Start databases
 task db:down      # Stop databases
 task lint         # Run all linters
 task test         # Run all tests
+task update:all   # Update Homebrew + mise tools
+```
+
+### Maintenance
+
+```bash
+# Update everything
+task update:all
+
+# Show tool status summary
+task tools:status
 ```
 
 ### AI Agent Sandboxing

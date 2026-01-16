@@ -37,7 +37,6 @@ uv = "latest"
 # AI CODING TOOLS
 # =============================================================================
 # Installation priority: curl > mise > bun > npm > homebrew
-#
 # Claude Code - Install via curl (npm is deprecated):
 #   curl -fsSL https://claude.ai/install.sh | bash
 #
@@ -115,8 +114,7 @@ VISUAL = "cursor --wait"
 HOMEBREW_NO_ANALYTICS = "1"
 HOMEBREW_NO_ENV_HINTS = "1"
 
-# Docker (OrbStack)
-DOCKER_HOST = "unix://{{env.HOME}}/.orbstack/run/docker.sock"
+#
 
 # XDG Base Directory (standardize config locations)
 XDG_CONFIG_HOME = "{{env.HOME}}/.config"

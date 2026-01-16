@@ -16,6 +16,8 @@ This script:
 3. Adds mise shims to PATH
 4. Verifies installation
 
+Note: Claude Code is installed via the curl installer (not mise). See `task stage:ai-tools` for the Claude install step.
+
 ---
 
 ## The Problem
