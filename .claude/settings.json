@@ -1,4 +1,9 @@
 {
+  "permissions": {
+    "allow": [
+      "*"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {
@@ -163,7 +168,6 @@
     "plugin-dev@claude-plugins-official": true,
     "ralph-loop@claude-plugins-official": true,
     "clangd-lsp@claude-plugins-official": true,
-    "circleback@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
     "hookify@claude-plugins-official": true,
     "agent-orchestration@claude-code-workflows": true,
@@ -249,12 +253,6 @@
     "superpowers@claude-plugins-official": true,
     "vercel@claude-plugins-official": true,
     "conductor-workflows@guilde-plugins": true,
-    "conductor@claude-code-workflows": true,
-    "figma@claude-plugins-official": true
-  },
-  "permissions": {
-    "allow": [
-      "*"
-    ]
+    "conductor@claude-code-workflows": true
   }
 }
