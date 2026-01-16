@@ -1,9 +1,0 @@
-{
-  "name": "guilde-workflows",
-  "version": "1.0.0",
-  "description": "Multi-agent workflow orchestration with TDD enforcement, conductor pattern, and development automation",
-  "author": {
-    "name": "guilde-lite",
-    "email": "team@pagerguild.dev"
-  }
-}
