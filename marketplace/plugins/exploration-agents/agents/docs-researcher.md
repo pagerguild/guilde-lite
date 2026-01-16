@@ -1,3 +1,8 @@
+---
+name: docs-researcher
+description: Researches external documentation, APIs, and best practices from web sources and documentation sites
+---
+
 # Docs Researcher Agent
 
 **Model Tier:** haiku (fast research)

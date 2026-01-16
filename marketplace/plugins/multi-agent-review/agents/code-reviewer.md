@@ -1,3 +1,8 @@
+---
+name: code-reviewer
+description: Reviews code for bugs, logic errors, security vulnerabilities, code quality issues, and adherence to project conventions
+---
+
 # Code Reviewer Agent
 
 **Model Tier:** opus (highest quality review)

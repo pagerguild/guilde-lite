@@ -18,11 +18,40 @@
 
 | Track ID | Title | Type | Priority |
 |----------|-------|------|----------|
+| QUALITY-001 | Plugin Validation Automation | Quality | P1 |
 | UPSTREAM-001 | Conductor UFRP Adoption | Enhancement | P2 |
 | UPSTREAM-002 | Code Simplifier Integration | Enhancement | P2 |
 | UPSTREAM-003 | Superpowers Pattern Adoption | Enhancement | P3 |
 
 ### Backlog Details
+
+#### QUALITY-001: Plugin Validation Automation
+Automate plugin and marketplace validation in CI/CD pipeline.
+
+**Background:** Analysis on 2026-01-15 discovered that the official schema URL (https://anthropic.com/claude-code/marketplace.schema.json) returns 404. While `claude plugin validate` CLI works internally, there's no external JSON Schema validation available.
+
+**Research Completed (2026-01-15):**
+- Researched official plugin-dev patterns from claude-plugins-official
+- Documented component frontmatter schemas (skills, commands, agents)
+- Identified official plugin-validator agent for validation
+- Documented gaps: all 15 plugins missing version, keywords fields
+
+**Current State:**
+- 15 plugins validated via CLI (all pass with warnings)
+- All plugins missing `version` field in plugin.json
+- CLI validation only covers plugin.json and marketplace.json
+- Component validation available via plugin-dev:plugin-validator agent
+- No CI/CD integration for validation
+
+**Scope:**
+1. Add `version` field to all plugin.json files
+2. Add `keywords` field for discoverability
+3. Use plugin-dev:plugin-validator agent for comprehensive validation
+4. Integrate validation into CI pipeline
+5. Add pre-commit hook for validation
+
+**Documentation:**
+- Analysis: [docs/PLUGIN-SCHEMA-VALIDATION.md](../docs/PLUGIN-SCHEMA-VALIDATION.md)
 
 #### UPSTREAM-001: Conductor UFRP Adoption
 Adopt Universal File Resolution Protocol from conductor v0.2.0 for improved path handling.

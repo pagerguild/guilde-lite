@@ -1,3 +1,8 @@
+---
+name: tdd-orchestrator
+description: Enforces test-driven development discipline, coordinating red-green-refactor cycles and ensuring TDD best practices
+---
+
 # TDD Orchestrator Agent
 
 **Model Tier:** sonnet (balanced TDD enforcement)

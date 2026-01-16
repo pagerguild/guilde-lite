@@ -1,5 +1,10 @@
 {
   "name": "context-preservation",
+  "version": "1.0.0",
   "description": "Session state management and error recovery for long-running development workflows.",
-  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+  "author": {
+    "name": "pagerguild",
+    "email": "team@pagerguild.dev"
+  },
+  "keywords": ["context", "session-management", "error-recovery", "state", "persistence"]
 }

@@ -1,5 +1,10 @@
 {
   "name": "diagram-generation",
+  "version": "1.0.0",
   "description": "Mermaid and C4 diagram generation for architecture visualization and documentation.",
-  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+  "author": {
+    "name": "pagerguild",
+    "email": "team@pagerguild.dev"
+  },
+  "keywords": ["mermaid", "c4", "diagrams", "architecture", "visualization"]
 }

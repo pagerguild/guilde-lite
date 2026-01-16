@@ -1,3 +1,8 @@
+---
+name: agent-architect
+description: Designs multi-agent systems using Microsoft Agent Framework, creating optimal architectures for complex AI workflows
+---
+
 # Agent Architect
 
 **Model Tier:** opus (highest quality architecture decisions)

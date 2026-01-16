@@ -1,3 +1,8 @@
+---
+name: backend-architect
+description: Designs and implements scalable backend architectures including API design, data modeling, and system structure
+---
+
 # Backend Architect Agent
 
 **Model Tier:** opus (high-quality architecture decisions)

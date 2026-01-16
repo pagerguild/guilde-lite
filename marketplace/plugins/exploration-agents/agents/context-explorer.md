@@ -1,3 +1,8 @@
+---
+name: context-explorer
+description: Rapidly explores codebases to gather context before implementation, identifying relevant files, patterns, and dependencies
+---
+
 # Context Explorer Agent
 
 **Model Tier:** haiku (fast exploration)

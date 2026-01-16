@@ -1,5 +1,10 @@
 {
   "name": "microsoft-agents",
+  "version": "1.0.0",
   "description": "Microsoft Agent Framework for building AI agents with Python SDK.",
-  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+  "author": {
+    "name": "pagerguild",
+    "email": "team@pagerguild.dev"
+  },
+  "keywords": ["microsoft", "agent-framework", "python", "workflows", "sdk"]
 }

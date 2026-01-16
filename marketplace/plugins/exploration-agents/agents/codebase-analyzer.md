@@ -1,3 +1,8 @@
+---
+name: codebase-analyzer
+description: Performs static analysis to identify patterns, anti-patterns, technical debt, and improvement opportunities
+---
+
 # Codebase Analyzer Agent
 
 **Model Tier:** haiku (fast analysis)

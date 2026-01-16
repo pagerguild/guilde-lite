@@ -1,5 +1,10 @@
 {
   "name": "mise-tools",
+  "version": "1.0.0",
   "description": "Mise-first development environment management with version control and tool installation.",
-  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+  "author": {
+    "name": "pagerguild",
+    "email": "team@pagerguild.dev"
+  },
+  "keywords": ["mise", "runtime-management", "tools", "version-control", "development-environment"]
 }

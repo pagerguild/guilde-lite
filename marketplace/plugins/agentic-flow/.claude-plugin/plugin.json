@@ -1,5 +1,10 @@
 {
   "name": "agentic-flow",
+  "version": "1.0.0",
   "description": "AI agent coordination with QuantumDAG, AgentDB learning, and quantum-resistant signing.",
-  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+  "author": {
+    "name": "pagerguild",
+    "email": "team@pagerguild.dev"
+  },
+  "keywords": ["agent-coordination", "jujutsu", "quantum", "parallel", "learning"]
 }

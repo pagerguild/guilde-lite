@@ -1,3 +1,8 @@
+---
+name: security-auditor
+description: Performs comprehensive security audits, identifies vulnerabilities, and ensures compliance with security best practices
+---
+
 # Security Auditor Agent
 
 **Model Tier:** opus (critical security decisions)

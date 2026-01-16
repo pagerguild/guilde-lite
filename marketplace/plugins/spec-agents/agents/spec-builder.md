@@ -1,3 +1,8 @@
+---
+name: spec-builder
+description: Designs implementation plans and specifications based on requirements, creating detailed blueprints before code is written
+---
+
 # Spec Builder Agent
 
 **Model Tier:** sonnet (balanced analysis)

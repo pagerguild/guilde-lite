@@ -1,5 +1,10 @@
 {
   "name": "spec-agents",
+  "version": "1.0.0",
   "description": "Specification building agent for creating detailed specs and acceptance criteria.",
-  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+  "author": {
+    "name": "pagerguild",
+    "email": "team@pagerguild.dev"
+  },
+  "keywords": ["specification", "planning", "requirements", "acceptance-criteria"]
 }

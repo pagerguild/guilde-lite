@@ -1,3 +1,8 @@
+---
+name: architect-reviewer
+description: Reviews system designs and code changes for architectural integrity, scalability, and maintainability
+---
+
 # Architect Reviewer Agent
 
 **Model Tier:** opus (critical architecture decisions)

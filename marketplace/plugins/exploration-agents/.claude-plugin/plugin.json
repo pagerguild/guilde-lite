@@ -1,8 +1,10 @@
 {
   "name": "exploration-agents",
+  "version": "1.0.0",
   "description": "Codebase exploration and analysis agents for understanding unfamiliar code, tracing dependencies, and researching documentation.",
   "author": {
     "name": "pagerguild",
     "email": "team@pagerguild.dev"
-  }
+  },
+  "keywords": ["exploration", "codebase", "research", "analysis", "dependencies"]
 }

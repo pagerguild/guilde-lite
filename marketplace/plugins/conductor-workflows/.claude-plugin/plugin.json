@@ -1,8 +1,10 @@
 {
   "name": "conductor-workflows",
+  "version": "1.0.0",
   "description": "Slash commands for orchestrating multi-phase implementation workflows using the conductor pattern. Provides track management, phase execution, checkpoints, and progress tracking.",
   "author": {
     "name": "pagerguild",
     "email": "team@pagerguild.dev"
-  }
+  },
+  "keywords": ["workflow", "conductor", "project-management", "tracks", "checkpoints"]
 }

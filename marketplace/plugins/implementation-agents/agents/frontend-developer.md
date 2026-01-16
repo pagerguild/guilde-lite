@@ -1,3 +1,8 @@
+---
+name: frontend-developer
+description: Builds React components, implements responsive layouts, and handles client-side state management with modern frontend practices
+---
+
 # Frontend Developer Agent
 
 **Model Tier:** sonnet (balanced implementation)

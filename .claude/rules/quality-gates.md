@@ -22,6 +22,28 @@ Rules for code quality enforcement in guilde-lite.
 - **Python:** Type hints required for public APIs
 - **Go:** `go vet` must pass
 
+### 4. Plugin Validation
+- **Plugin Changes:** Run `claude plugin validate` before commit
+- **Marketplace Changes:** Validate marketplace.json structure
+- **Component Changes:** Verify commands, skills, agents follow schema
+- **Enforcement:** Manual validation required (no CI yet - see QUALITY-001)
+
+**Plugin Validation Commands:**
+```bash
+# Validate marketplace
+claude plugin validate ./marketplace
+
+# Validate individual plugin
+claude plugin validate ./marketplace/plugins/plugin-name
+
+# Validate all plugins
+for plugin in marketplace/plugins/*/; do
+  claude plugin validate "$plugin"
+done
+```
+
+**Reference:** [docs/PLUGIN-SCHEMA-VALIDATION.md](../../docs/PLUGIN-SCHEMA-VALIDATION.md)
+
 ---
 
 ## Pre-Merge Gates

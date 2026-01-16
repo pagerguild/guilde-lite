@@ -1,5 +1,10 @@
 {
   "name": "release-research",
+  "version": "1.0.0",
   "description": "Release notes and changelog research for tracking upstream updates.",
-  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+  "author": {
+    "name": "pagerguild",
+    "email": "team@pagerguild.dev"
+  },
+  "keywords": ["releases", "changelog", "research", "updates", "tracking"]
 }

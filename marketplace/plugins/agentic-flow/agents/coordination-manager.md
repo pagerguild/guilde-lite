@@ -1,3 +1,8 @@
+---
+name: coordination-manager
+description: Manages multi-agent workflows using QuantumDAG coordination, ensuring conflict-free parallel operations
+---
+
 # Coordination Manager Agent
 
 **Model Tier:** sonnet (balanced quality and speed)

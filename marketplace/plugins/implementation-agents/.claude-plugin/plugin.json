@@ -1,8 +1,10 @@
 {
   "name": "implementation-agents",
+  "version": "1.0.0",
   "description": "Development and implementation agents for backend, frontend, database, and test automation.",
   "author": {
     "name": "pagerguild",
     "email": "team@pagerguild.dev"
-  }
+  },
+  "keywords": ["implementation", "backend", "frontend", "database", "tdd"]
 }

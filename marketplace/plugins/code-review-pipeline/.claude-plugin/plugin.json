@@ -1,5 +1,10 @@
 {
   "name": "code-review-pipeline",
+  "version": "1.0.0",
   "description": "Multi-stage code review workflow with parallel agent reviews and test generation.",
-  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+  "author": {
+    "name": "pagerguild",
+    "email": "team@pagerguild.dev"
+  },
+  "keywords": ["pull-request", "code-review", "testing", "pipeline", "multi-agent"]
 }

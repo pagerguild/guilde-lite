@@ -1,3 +1,8 @@
+---
+name: database-optimizer
+description: Optimizes database performance through query analysis, indexing strategies, and schema improvements
+---
+
 # Database Optimizer Agent
 
 **Model Tier:** sonnet (balanced optimization)

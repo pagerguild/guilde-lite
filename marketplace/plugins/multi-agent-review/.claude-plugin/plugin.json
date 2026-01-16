@@ -1,8 +1,10 @@
 {
   "name": "multi-agent-review",
+  "version": "1.0.0",
   "description": "Parallel code review agents for comprehensive quality assurance. Includes code reviewer, security auditor, and architecture reviewer.",
   "author": {
     "name": "pagerguild",
     "email": "team@pagerguild.dev"
-  }
+  },
+  "keywords": ["code-review", "multi-agent", "quality", "security", "architecture"]
 }

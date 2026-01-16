@@ -1,8 +1,10 @@
 {
   "name": "tdd-automation",
+  "version": "1.0.0",
   "description": "Test-driven development workflow with red/green/refactor phases. Enforces TDD discipline with phase tracking, test validation, and coverage monitoring.",
   "author": {
     "name": "pagerguild",
     "email": "team@pagerguild.dev"
-  }
+  },
+  "keywords": ["tdd", "testing", "red-green-refactor", "coverage", "validation"]
 }

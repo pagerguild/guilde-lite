@@ -1,5 +1,10 @@
 {
   "name": "jj-tools",
+  "version": "1.0.0",
   "description": "Jujutsu (jj) version control commands and workflow guidance.",
-  "author": {"name": "pagerguild", "email": "team@pagerguild.dev"}
+  "author": {
+    "name": "pagerguild",
+    "email": "team@pagerguild.dev"
+  },
+  "keywords": ["jujutsu", "version-control", "git", "vcs", "workflow"]
 }

@@ -1,3 +1,8 @@
+---
+name: test-automator
+description: Creates comprehensive test suites using modern testing frameworks to ensure code quality through automated testing strategies
+---
+
 # Test Automator Agent
 
 **Model Tier:** sonnet (balanced testing)
