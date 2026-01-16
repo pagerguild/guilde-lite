@@ -3,10 +3,6 @@
     "jj-mcp-server": {
       "command": "npx",
       "args": ["jj-mcp-server"]
-    },
-    "agentic-jujutsu": {
-      "command": "node",
-      "args": ["node_modules/agentic-jujutsu/bin/mcp-server.js"]
     }
   }
 }

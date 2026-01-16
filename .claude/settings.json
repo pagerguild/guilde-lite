@@ -212,7 +212,7 @@
     "pyright-lsp@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
     "explanatory-output-style@claude-plugins-official": true,
-    "slack@claude-plugins-official": true,
+    "slack@claude-plugins-official": false,
     "gopls-lsp@claude-plugins-official": true,
     "c4-architecture@claude-code-workflows": true,
     "multi-platform-apps@claude-code-workflows": true,
