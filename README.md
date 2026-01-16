@@ -164,6 +164,30 @@ task update:all
 task tools:status
 ```
 
+### Claude Flow
+
+```bash
+# Initialize claude-flow in this repo
+task claude-flow:init
+
+# Install claude-flow globally (bun)
+task claude-flow:install
+
+# Show claude-flow version
+task claude-flow:version
+
+# Quick claude-flow smoke check
+task claude-flow:doctor
+
+# Start the MCP server
+task claude-flow:mcp:start
+
+# Run any claude-flow command
+task claude-flow:run -- --help
+```
+
+Included in `task setup:full` via `task claude-flow:install`.
+
 ### AI Agent Sandboxing
 
 Three levels of isolation to prevent AI agents from doing anything nefarious:

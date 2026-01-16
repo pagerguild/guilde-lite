@@ -13,6 +13,7 @@ A comprehensive reference guide for all tools in the guilde-lite development env
 - [Stage 8: Security Tools](#stage-8-security-tools)
 - [Stage 9: Build Tools](#stage-9-build-tools)
 - [Runtimes & Language Tools](#runtimes--language-tools)
+- [Claude Flow](#claude-flow)
 
 ---
 
@@ -1448,11 +1449,26 @@ task tools:status
 
 Outputs Homebrew formulae/casks plus mise configured/active versions.
 
+### Claude Flow
+
+```bash
+task claude-flow:init
+task claude-flow:install
+task claude-flow:version
+task claude-flow:doctor
+task claude-flow:mcp:start
+task claude-flow:run -- --help
+```
+
+Included in `task setup:full` via `task claude-flow:install`.
+
 ### List Commands
 
 ```bash
 task -l
 ```
+
+Includes claude-flow wrappers (`claude-flow:*`) for bun-based usage.
 
 ### Global AI Tools
 

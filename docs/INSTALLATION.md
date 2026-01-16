@@ -1223,6 +1223,7 @@ Everything including AI and databases (~40 minutes)
 - Stage 7: AI editors (Cursor)
 - Stage 8: Security tools
 - Stage AI: AI CLIs (Claude, Codex, Gemini, OpenCode)
+- claude-flow (global bun install)
 - Stage D: Database containers
 
 **Use when:**
@@ -1299,6 +1300,19 @@ List all available project commands:
 
 ```bash
 task -l
+```
+
+This includes claude-flow wrappers (`claude-flow:*`) for bun-based usage.
+
+Claude Flow (bunx wrapper):
+
+```bash
+task claude-flow:init
+task claude-flow:install
+task claude-flow:version
+task claude-flow:doctor
+task claude-flow:mcp:start
+task claude-flow:run -- --help
 ```
 
 ### 3. Configure Shell

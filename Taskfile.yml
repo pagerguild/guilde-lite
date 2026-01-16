@@ -368,6 +368,7 @@ tasks:
       - task: stage:7
       - task: stage:8
       - task: stage:ai-tools
+      - task: claude-flow:install
       - task: stage:databases
       - echo "✓ Full setup complete"
 
@@ -394,6 +395,47 @@ tasks:
     desc: "Show tool status summary (brew, mise, task, runtimes)"
     cmds:
       - bash scripts/tool-status.sh
+
+  # ===========================================================================
+  # CLAUDE-FLOW (bunx wrappers)
+  # ===========================================================================
+
+  claude-flow:init:
+    desc: "Initialize claude-flow in the current repo"
+    cmds:
+      - command -v bun >/dev/null || { echo "bun not installed"; exit 1; }
+      - bunx -y claude-flow@v3alpha init
+
+  claude-flow:install:
+    desc: "Install claude-flow globally via bun"
+    cmds:
+      - command -v bun >/dev/null || { echo "bun not installed"; exit 1; }
+      - bun add -g claude-flow@v3alpha
+
+  claude-flow:version:
+    desc: "Show claude-flow version (global)"
+    cmds:
+      - command -v claude-flow >/dev/null || { echo "claude-flow not installed"; exit 1; }
+      - claude-flow --version
+
+  claude-flow:doctor:
+    desc: "Quick claude-flow smoke check"
+    cmds:
+      - command -v claude-flow >/dev/null || { echo "claude-flow not installed"; exit 1; }
+      - claude-flow --help >/dev/null
+      - echo "✓ claude-flow OK"
+
+  claude-flow:mcp:start:
+    desc: "Start claude-flow MCP server (bunx)"
+    cmds:
+      - command -v bun >/dev/null || { echo "bun not installed"; exit 1; }
+      - bunx -y claude-flow@v3alpha mcp start
+
+  claude-flow:run:
+    desc: "Run claude-flow with custom args (usage: task claude-flow:run -- <args>)"
+    cmds:
+      - command -v bun >/dev/null || { echo "bun not installed"; exit 1; }
+      - bunx -y claude-flow@v3alpha {{.CLI_ARGS}}
 
   # ===========================================================================
   # LEGACY ALIASES (for backwards compatibility)
